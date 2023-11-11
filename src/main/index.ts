@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import readFeather from './feather'
+import { loadFeatherFile, queryGlobalTable, tableToJson } from './feather'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -14,7 +14,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
+      sandbox: false
     }
   })
 
@@ -71,14 +71,22 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
+ipcMain.on('load-feather-file', async (event, filePath: string) => {
+  try {
+    const table = await loadFeatherFile(filePath)
+    event.reply('load-feather-file-reply', table)
+  } catch (error) {
+    event.reply('load-feather-file-reply', error)
+  }
+})
 
-ipcMain.handle('ping', async (event, args) => {
-  // Handle the ping request and return a response
-  return 'pong';
-});
+ipcMain.on('query-global-table', (event, query?: { select?: string[] }) => {
+  try {
+    const table = queryGlobalTable(query)
+    const json = tableToJson(table)
 
-ipcMain.handle('readFeather', async (event, args) => {
-  console.log('readFeather');
-  console.log(args);
-  return readFeather(args);
-});
+    event.reply('query-global-table-reply', json)
+  } catch (error) {
+    event.reply('query-global-table-reply', error)
+  }
+})

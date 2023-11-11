@@ -12,8 +12,30 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('feather', {
-      ping: () => ipcRenderer.invoke('ping'),
-      readFeather: (path: string) => ipcRenderer.invoke('readFeather', path),
+      loadFeatherFile: (filePath: string) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send('load-feather-file', filePath)
+          ipcRenderer.once('load-feather-file-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
+      queryGlobalTable: (query?: { select?: string[] }) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send('query-global-table', query)
+          ipcRenderer.once('query-global-table-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      }
     })
   } catch (error) {
     console.error(error)

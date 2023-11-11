@@ -20,10 +20,26 @@
     "build:linux": "electron-vite build && electron-builder --linux --config"
   },
   "dependencies": {
+    "@bokeh/bokehjs": "^3.3.1",
+    "@bokeh/numbro": "^1.6.2",
+    "@bokeh/slickgrid": "^2.4.4103",
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
+    "@visx/visx": "^3.4.1",
     "apache-arrow": "^14.0.0",
-    "electron-updater": "^6.1.1"
+    "choices.js": "^10.2.0",
+    "d3-polygon": "^3.0.1",
+    "electron-updater": "^6.1.1",
+    "flatbush": "^4.2.0",
+    "flatpickr": "^4.6.13",
+    "hammerjs": "^2.0.8",
+    "mathjax-full": "^3.2.2",
+    "nouislider": "^15.7.1",
+    "proj4": "^2.9.2",
+    "regl": "^2.1.0",
+    "timezone": "^1.0.23",
+    "underscore": "^1.13.6",
+    "underscore.template": "^0.1.7"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^1.0.1",

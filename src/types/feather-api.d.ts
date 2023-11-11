@@ -1,10 +1,10 @@
 declare global {
-    interface Window {
-      feather: {
-        ping: () => Promise<string>;
-    readFeather: (path: string) => Promise<{}>;
-      }
+  interface Window {
+    feather: {
+      loadFeatherFile: (filePath: string) => void
+      queryGlobalTable: (query?: { select?: string[] }) => Table | null
     }
+  }
 }
 
-export {};
+export {}
