@@ -3,15 +3,19 @@ import { Table, tableFromIPC } from 'apache-arrow'
 
 let globalTable: Table | null = null
 
-export const loadFeatherFile = (filePath: string): void => {
-  try {
-    const arrowBuffer = readFileSync(filePath)
-    globalTable = tableFromIPC(arrowBuffer)
-  } catch (error) {
-    console.error('Error reading Feather file:', error)
-    throw error
-  }
+export const loadFeatherFile = async (filePath: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const arrowBuffer = readFileSync(filePath)
+      globalTable = tableFromIPC(arrowBuffer)
+      resolve()
+    } catch (error) {
+      console.error('Error reading Feather file:', error)
+      reject(error)
+    }
+  })
 }
+
 export const queryGlobalTable = (query?: { select?: string[] }): Table | null => {
   if (!globalTable) {
     console.error('No table loaded')
