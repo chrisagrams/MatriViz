@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Group } from '@visx/group'
 import { Circle } from '@visx/shape'
 import { scaleLinear } from '@visx/scale'
 import { LinearGradient } from '@visx/gradient'
-import { line, curveBasis } from 'd3-shape'
-import { polygonContains } from 'd3-polygon'
+import useLasso from './lasso'
+import { DataPoint } from '../types'
 import styles from '../assets/plot.module.css'
 
-const Plot = ({ data }: { data: any[] }): JSX.Element => {
+const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
   const [dimensions, setDimensions] = useState({
     width: window.innerHeight - 50,
     height: window.innerHeight - 50
   })
-  const [lassoPoints, setLassoPoints] = useState<[number, number][]>([])
-  const [selectedPoints, setSelectedPoints] = useState([])
-  const [isLassoActive, setIsLassoActive] = useState(false)
+  const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([])
 
   useEffect(() => {
     const handleResize = (): void => {
@@ -35,37 +33,12 @@ const Plot = ({ data }: { data: any[] }): JSX.Element => {
     domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
   })
 
-  const handleMouseDown = (event: React.MouseEvent): void => {
-    setIsLassoActive(true)
-    setLassoPoints([[event.clientX, event.clientY]])
-  }
-
-  const handleMouseMove = (event: React.MouseEvent): void => {
-    if (!isLassoActive) return
-
-    const updatedLassoPoints: [number, number][] =
-      lassoPoints.length > 1 ? lassoPoints.slice(0, -1) : lassoPoints
-
-    const newPoint: [number, number] = [event.clientX, event.clientY]
-
-    const newPoints: [number, number][] = [...updatedLassoPoints, newPoint]
-
-    // Temporarily close the loop for visual effect
-    if (newPoints.length > 1) {
-      newPoints.push(newPoints[0])
-    }
-
-    setLassoPoints(newPoints)
-  }
-
-  const handleMouseUp = (): void => {
-    setIsLassoActive(false)
-    const selected = data.filter((d) => polygonContains(lassoPoints, [xScale(d.x), yScale(d.y)]))
-    setSelectedPoints(selected)
-    console.log('Selected points:', selected)
-  }
-
-  const lassoPath = line().curve(curveBasis)(lassoPoints)
+  const { handleMouseDown, handleMouseMove, handleMouseUp, Lasso } = useLasso({
+    data: data,
+    xScale: xScale,
+    yScale: yScale,
+    onSelection: setSelectedPoints
+  })
 
   return (
     <div className="container">
@@ -76,7 +49,6 @@ const Plot = ({ data }: { data: any[] }): JSX.Element => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        {/* <rect width={dimensions.width} height={dimensions.height} fill="transparent" /> */}
         <LinearGradient id="stroke" from="#ff614e" to="#ffdc64" />
         <Group>
           {data?.map((point, i) => (
@@ -90,7 +62,7 @@ const Plot = ({ data }: { data: any[] }): JSX.Element => {
             />
           ))}
         </Group>
-        {isLassoActive && <path d={lassoPath} fill="none" stroke="url(#stroke)" strokeWidth={3} />}
+        <Lasso />
       </svg>
     </div>
   )

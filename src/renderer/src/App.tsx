@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Plot from './components/plot'
 
 const App = (): JSX.Element => {
