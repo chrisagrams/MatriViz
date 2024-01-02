@@ -12,9 +12,29 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
     width: window.innerHeight - 50,
     height: window.innerHeight - 50
   })
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([])
 
+  const xScale = scaleLinear({
+    range: [0, dimensions.width * zoomLevel],
+    domain: [Math.min(...data.map((d) => d.x)), Math.max(...data.map((d) => d.x))]
+  })
+  const yScale = scaleLinear({
+    range: [dimensions.height * zoomLevel, 0],
+    domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
+  })
+
   useEffect(() => {
+    const handleWheel = (event: WheelEvent): void => {
+      const scaleFactor = 1.1;
+      let newZoomLevel = event.deltaY > 0 ? zoomLevel / scaleFactor : zoomLevel * scaleFactor;
+      if (newZoomLevel < 1) {
+        newZoomLevel = 1;
+      }
+      setZoomLevel(newZoomLevel);
+    };
+
+    window.addEventListener('wheel', handleWheel);
     const handleResize = (): void => {
       setDimensions({ width: window.innerHeight - 50, height: window.innerHeight - 50 })
     }
@@ -22,16 +42,7 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [])
-
-  const xScale = scaleLinear({
-    range: [0, dimensions.width],
-    domain: [Math.min(...data.map((d) => d.x)), Math.max(...data.map((d) => d.x))]
-  })
-  const yScale = scaleLinear({
-    range: [dimensions.height, 0],
-    domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
-  })
+  }, [zoomLevel])
 
   const { handleMouseDown, handleMouseMove, handleMouseUp, Lasso } = useLasso({
     data: data,
