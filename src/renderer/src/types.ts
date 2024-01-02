@@ -3,6 +3,13 @@ import { ScaleLinear } from 'd3-scale'
 export interface DataPoint {
   x: number
   y: number
+  index: string
+}
+
+export interface TooltipData {
+  top: number,
+  left: number,
+  data: DataPoint | null
 }
 
 export interface UseLassoProps {

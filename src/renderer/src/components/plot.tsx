@@ -3,8 +3,9 @@ import { Group } from '@visx/group'
 import { Circle } from '@visx/shape'
 import { scaleLinear } from '@visx/scale'
 import { LinearGradient } from '@visx/gradient'
+import { TooltipWithBounds, defaultStyles as tooltipStyles } from '@visx/tooltip';
 import useLasso from './lasso'
-import { DataPoint } from '../types'
+import { DataPoint, TooltipData } from '../types'
 import styles from '../assets/plot.module.css'
 
 const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
@@ -14,6 +15,7 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
   })
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([])
+  const [tooltip, setTooltip] = useState<TooltipData>();
 
   const xScale = scaleLinear({
     range: [0, dimensions.width * zoomLevel],
@@ -51,6 +53,18 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
     onSelection: setSelectedPoints
   })
 
+  const handleMouseEnter = (event, point: DataPoint) => {
+    setTooltip({
+      top: event.clientY,
+      left: event.clientX,
+      data: point
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip({top: 0, left:0, data: null });
+  };
+
   return (
     <div className="container">
       <svg
@@ -67,14 +81,26 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
               key={`point-${i}`}
               cx={xScale(point.x)}
               cy={yScale(point.y)}
-              r={1} // radius of point
+              r={1.5} // radius of point
               fill={selectedPoints.includes(point) ? 'red' : 'black'}
               className={styles.point}
+              onMouseEnter={(event) => handleMouseEnter(event, point)}
+              onMouseLeave={handleMouseLeave}
             />
           ))}
         </Group>
         <Lasso />
       </svg>
+
+      {tooltip?.data && (
+        <TooltipWithBounds
+          top={tooltip.top}
+          left={tooltip.left}
+          style={tooltipStyles}
+        >
+          Index: {tooltip.data.index}
+        </TooltipWithBounds>
+      )}
     </div>
   )
 }

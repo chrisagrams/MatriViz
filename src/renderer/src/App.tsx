@@ -10,13 +10,14 @@ const App = (): JSX.Element => {
     window.feather
       .loadFeatherFile('./resources/enge_modified_nocomp.feather')
       .then(() => {
-        return window.feather.queryGlobalTable({ select: ['umap_1', 'umap_2'] })
+        return window.feather.queryGlobalTable({ select: ['umap_1', 'umap_2', 'index'] })
       })
       .then((fetchedData) => {
         console.log('Data fetched:', fetchedData)
         const processedData = fetchedData.map((d) => ({
           x: d.umap_1,
-          y: d.umap_2
+          y: d.umap_2,
+          index: d.index,
         }))
         setData(processedData)
         setLoading(false)
