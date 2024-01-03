@@ -32,8 +32,11 @@ const App = (): JSX.Element => {
 
   return (
     <div className={styles.container}>
-      {/* <h1>MatriViz</h1> */}
-      <div className="container">{loading ? <div>Loading...</div> : <Plot data={data} />}</div>
+      <h1>MatriViz</h1>
+
+      <div className={styles.plotArea}>
+        <div className="container">{loading ? <div>Loading...</div> : <Plot data={data} />}</div>
+      </div>
     </div>
   )
 }

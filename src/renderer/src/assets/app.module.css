@@ -2,3 +2,8 @@
     display: flex;
     flex-direction: row;
 }
+
+.plotArea {
+    justify-self: flex-end;
+    margin-left: auto;
+}
