@@ -9,17 +9,22 @@ const useLasso = ({ data, xScale, yScale, onSelection }: UseLassoProps): UseLass
 
   const handleMouseDown = useCallback((event: React.MouseEvent) => {
     setIsLassoActive(true)
-    setLassoPoints([[event.clientX, event.clientY]])
+    const { left, top } = event.currentTarget.getBoundingClientRect()
+    setLassoPoints([[event.clientX - left, event.clientY - top]])
   }, [])
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {
       if (!isLassoActive) return
 
+      const { left, top } = event.currentTarget.getBoundingClientRect()
       const updatedLassoPoints: [number, number][] =
         lassoPoints.length > 1 ? lassoPoints.slice(0, -1) : lassoPoints
 
-      const newPoint: [number, number] = [event.clientX, event.clientY]
+      const newPoint: [number, number] = [
+        event.clientX - left,
+        event.clientY - top,
+      ]
 
       const newPoints: [number, number][] = [...updatedLassoPoints, newPoint]
 
