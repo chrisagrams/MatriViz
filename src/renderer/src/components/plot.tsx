@@ -115,17 +115,17 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
           left={tooltip.left}
           style={tooltipStyles}
         >
-          Index: {tooltip.data.index}
+          <b>Index:</b> {tooltip.data.index}
           <br />
-          Score: {tooltip.data.score}
+          <b>Score:</b> {tooltip.data.score}
         </TooltipWithBounds>
       )}
 
       <svg
         width={80}
         height={100}
-        x={dimensions.width - 80} // Adjust the x position as needed
-        y={0} // Adjust the y position as needed
+        x={dimensions.width - 80} 
+        y={0}
       >
         <LinearGradient id="colorScale" from="#ff0000" to="#ffff00" vertical={true} />
         <rect x={0} y={0} width={20} height={100} fill="url(#colorScale)" />
