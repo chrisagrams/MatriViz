@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Plot from './components/plot'
 import styles from './assets/app.module.css'
+import { ColorRing } from 'react-loader-spinner';
 
 const App = (): JSX.Element => {
   const [data, setData] = useState([])
@@ -32,10 +33,24 @@ const App = (): JSX.Element => {
 
   return (
     <div className={styles.container}>
-      <h1>MatriViz</h1>
-
+      <div className={styles.panel}>
+        <h1>MatriViz</h1>
+      </div>
       <div className={styles.plotArea}>
-        <div className="container">{loading ? <div>Loading...</div> : <Plot data={data} />}</div>
+        <div className="container">{loading ? 
+        <div className={styles.loading}>
+          <ColorRing
+          visible={true}
+          height="80"
+          width="80"
+          ariaLabel="blocks-loading"
+          wrapperStyle={{}}
+          wrapperClass="blocks-wrapper"
+          colors={['#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1']}
+          />
+          <p>Loading...</p>
+        </div>
+         : <Plot data={data} />}</div>
       </div>
     </div>
   )
