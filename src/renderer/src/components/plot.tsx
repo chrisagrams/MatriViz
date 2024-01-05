@@ -5,6 +5,7 @@ import { scaleLinear } from '@visx/scale'
 import { LinearGradient } from '@visx/gradient'
 import { Text } from '@visx/text'
 import { TooltipWithBounds, defaultStyles as tooltipStyles } from '@visx/tooltip';
+import { GridRows, GridColumns } from '@visx/grid';
 import useLasso from './lasso'
 import { DataPoint, TooltipData } from '../types'
 import styles from '../assets/plot.module.css'
@@ -93,6 +94,16 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
       >
         <LinearGradient id="stroke" from="#6699ff" to="#9933cc" />
         <Group>
+          <GridRows
+            scale={yScale}
+            width={dimensions.width * zoomLevel}
+            stroke="#e0e0e0"
+          />
+          <GridColumns
+            scale={xScale}
+            height={dimensions.height * zoomLevel}
+            stroke="#e0e0e0"
+          />
           {data?.map((point, i) => (
             <Circle
               key={`point-${i}`}
