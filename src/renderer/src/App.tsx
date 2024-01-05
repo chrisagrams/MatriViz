@@ -8,8 +8,17 @@ const App = (): JSX.Element => {
   const [loading, setLoading] = useState(true)
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
 
+  const toggleGene = (gene) => {
+    if (selectedGenes.includes(gene)) {
+      setSelectedGenes(selectedGenes.filter((selectedGene) => selectedGene !== gene));
+    } else {
+      setSelectedGenes([...selectedGenes, gene]);
+    }
+  };
+
   // Fetch and process the data
   useEffect(() => {
+    // setLoading(true)
     window.feather
       .loadFeatherFile('./resources/enge_modified_nocomp.feather')
       .then(() => {
@@ -29,12 +38,23 @@ const App = (): JSX.Element => {
       .catch((error) => {
         console.error('Error fetching data:', error)
       })
-  }, [])
+  }, [selectedGenes])
 
   return (
     <div className={styles.container}>
       <div className={styles.panel}>
         <h1>MatriViz</h1>
+        <div>
+        {['SAMD11', 'HES4', 'CD44'].map((gene) => (
+          <button
+            key={gene}
+            onClick={() => toggleGene(gene)}
+            className={selectedGenes.includes(gene) ? styles.selectedGeneButton : styles.geneButton}
+          >
+            {gene}
+          </button>
+        ))}
+      </div>
       </div>
       <div className={styles.plotArea}>
         <div className="container">{loading ? 

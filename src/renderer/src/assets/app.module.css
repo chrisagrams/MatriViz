@@ -7,6 +7,8 @@
 .panel {
     width: 33%;
     display: flex;
+    flex-direction: column;
+    padding: 15px;
 }
 
 .plotArea {
@@ -18,4 +20,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.selectedGeneButton {
+    color: blue;
+}
+
+.geneButton {
+    color: black;
 }

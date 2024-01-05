@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Group } from '@visx/group'
 import { Circle } from '@visx/shape'
 import { scaleLinear } from '@visx/scale'
@@ -15,21 +15,27 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
     width: window.innerHeight - 50,
     height: window.innerHeight - 50
   })
+  const svgContainerRef = useRef<SVGSVGElement | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([]);
   const [tooltip, setTooltip] = useState<TooltipData>();
   const [minScore, setMinScore] = useState(0)
   const [maxScore, setMaxScore] = useState(0)
 
+  const [transformX, setTransformX] = useState(0);
+  const [transformY, setTransformY] = useState(0);
 
   const xScale = scaleLinear({
-    range: [0, dimensions.width * zoomLevel],
+    range: [(0 - transformX) / zoomLevel, (dimensions.width - transformX) / zoomLevel],
     domain: [Math.min(...data.map((d) => d.x)), Math.max(...data.map((d) => d.x))]
   })
+  
   const yScale = scaleLinear({
-    range: [dimensions.height * zoomLevel, 0],
+    range: [(dimensions.height - transformY) / zoomLevel, (0 - transformY) / zoomLevel],
     domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
   })
+  
+
   const colorScale = scaleLinear<string>({
     domain: [minScore, maxScore],
     range: ['#ffff00', '#ff0000'], // Yellow to Red
@@ -38,10 +44,27 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
   useEffect(() => {
     const handleWheel = (event: WheelEvent): void => {
       const scaleFactor = 1.1;
+      const svgContainer = svgContainerRef.current;
+      if (!svgContainer) return;
+
+      const svgRect = svgContainer.getBoundingClientRect();
+      const mouseX = event.clientX - svgRect.left;
+      const mouseY = event.clientY - svgRect.top;
+
       let newZoomLevel = event.deltaY > 0 ? zoomLevel / scaleFactor : zoomLevel * scaleFactor;
-      if (newZoomLevel < 1) {
+
+      const newTransformX = mouseX - (mouseX - transformX) * (newZoomLevel / zoomLevel);
+      const newTransformY = mouseY - (mouseY - transformY) * (newZoomLevel / zoomLevel);
+      setTransformX(newTransformX);
+      setTransformY(newTransformY);
+
+      if (newZoomLevel > 1) {
         newZoomLevel = 1;
+        setTransformX(0);
+        setTransformY(0);
       }
+
+      console.log(newZoomLevel);
       setZoomLevel(newZoomLevel);
     };
 
@@ -86,6 +109,7 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
   return (
     <div className="container">
       <svg
+        ref={svgContainerRef}
         width={dimensions.width}
         height={dimensions.height}
         onMouseDown={handleMouseDown}
@@ -96,12 +120,12 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
         <Group>
           <GridRows
             scale={yScale}
-            width={dimensions.width * zoomLevel}
+            width={dimensions.width}
             stroke="#e0e0e0"
           />
           <GridColumns
             scale={xScale}
-            height={dimensions.height * zoomLevel}
+            height={dimensions.height}
             stroke="#e0e0e0"
           />
           {data?.map((point, i) => (
@@ -116,8 +140,8 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
               onMouseLeave={handleMouseLeave}
             />
           ))}
+          <Lasso />
         </Group>
-        <Lasso />
       </svg>
 
       {tooltip?.data && (
