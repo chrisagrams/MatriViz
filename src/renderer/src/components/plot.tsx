@@ -151,7 +151,13 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
               cx={xScale(point.x)}
               cy={yScale(point.y)}
               r={2} // radius of point
-              fill={selectedPoints.includes(point) ? 'blue' : colorScale(point.score)}
+              fill={
+                selectedPoints.includes(point)
+                  ? colorScale(point.score)
+                  : selectedPoints.length > 0
+                  ? 'gray'
+                  : colorScale(point.score)
+              }
               className={styles.point}
               onMouseEnter={(event) => handleMouseEnter(event, point)}
               onMouseLeave={handleMouseLeave}
