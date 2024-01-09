@@ -11,6 +11,8 @@ const App = (): JSX.Element => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
+  const [selectedBadges, setSelectedBadges] = useState(['SAMD11', 'HES4', 'CD44']);
+  const [singleToggle, setSingleToggle] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showAllGenes, setShowAllGenes] = useState(false);
   const [selectedData, setSelectedData] = useState<DataPoint[]>([]);
@@ -21,7 +23,31 @@ const App = (): JSX.Element => {
     const selectedCategory = event.target.value;
     setSelectedData([]);
     setSelectedGenes(categories[selectedCategory]);
+    setSelectedBadges(categories[selectedCategory]);
     setSelectedCategory(selectedCategory);
+  };
+
+  const handleBadgeClick = (badge) => {
+    const badgeElements = document.querySelectorAll(`.${styles.geneBadge}`);
+
+    if (!singleToggle) {
+      setSelectedBadges([badge]);
+      badgeElements.forEach((element) => {
+        if (element.dataset.key === badge) {
+          element.classList.add(styles.selectedBadge);
+        } else {
+          element.classList.remove(styles.selectedBadge);
+        }
+      })
+    }
+    else {
+      setSelectedBadges(selectedGenes);
+      badgeElements.forEach((element) => {
+        element.classList.remove(styles.selectedBadge);
+      });
+    }
+    
+    setSingleToggle(!singleToggle);
   };
 
 
@@ -37,9 +63,11 @@ const App = (): JSX.Element => {
 
   const addSelectedGene = (gene) => {
     setSelectedGenes([...selectedGenes, gene]);
+    setSelectedBadges([...selectedGenes, gene]);
     setSearchInput('');
     setSearchResults([]);
   };
+
 
   // Fetch and process the data
   useEffect(() => {
@@ -47,7 +75,7 @@ const App = (): JSX.Element => {
     window.feather
       .loadFeatherFile('./resources/enge_modified_nocomp.feather')
       .then(() => {
-        return window.feather.queryGlobalTable({ select: [...selectedGenes, 'umap_1', 'umap_2', 'index'] })
+        return window.feather.queryGlobalTable({ select: [...selectedBadges, 'umap_1', 'umap_2', 'index'] })
       })
       .then((fetchedData) => {
         console.log('Data fetched:', fetchedData)
@@ -55,7 +83,7 @@ const App = (): JSX.Element => {
           x: d.umap_1,
           y: d.umap_2,
           index: d.index,
-          score: selectedGenes.reduce((acc, gene) => acc + d[gene], 0),
+          score: selectedBadges.reduce((acc, gene) => acc + d[gene], 0),
         }))
         setData(processedData)
         setLoading(false)
@@ -63,7 +91,7 @@ const App = (): JSX.Element => {
       .catch((error) => {
         console.error('Error fetching data:', error)
       })
-  }, [selectedGenes])
+  }, [selectedBadges])
 
   const handleSelectedData = (selectedData) => {
     setSelectedData(selectedData);
@@ -71,6 +99,7 @@ const App = (): JSX.Element => {
 
   const removeGene = (geneToRemove) => {
     setSelectedGenes(selectedGenes.filter((gene) => gene !== geneToRemove));
+    setSelectedBadges(selectedGenes.filter((gene) => gene !== geneToRemove));
   };
 
   return (
@@ -113,15 +142,15 @@ const App = (): JSX.Element => {
       <div className={styles.badgeContainer}>
         {showAllGenes
           ? selectedGenes.map((gene) => (
-              <div key={gene} className={styles.geneBadge}>
-                <span>{gene}</span>
+              <div key={gene} className={styles.geneBadge} data-key={gene}>
+                <span onClick={() => handleBadgeClick(gene)}>{gene}</span>
                 <button onClick={() => removeGene(gene)}>X</button>
               </div>
             ))
           : <>
             {selectedGenes.slice(0, 10).map((gene) => (
-              <div key={gene} className={styles.geneBadge}>
-                <span>{gene}</span>
+              <div key={gene} className={styles.geneBadge} data-key={gene}>
+                <span onClick={() => handleBadgeClick(gene)}>{gene}</span>
                 <button onClick={() => removeGene(gene)}>X</button>
               </div>
             ))}

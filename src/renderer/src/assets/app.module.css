@@ -70,7 +70,12 @@
     overflow: scroll;
     min-height: 100px;
 }
-  
+
+.selectedBadge {
+    background-color: yellow !important ;
+    color: black !important;
+}
+
 .geneBadge {
     background-color: #007bff;
     color: white;
