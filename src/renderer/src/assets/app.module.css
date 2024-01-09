@@ -29,3 +29,59 @@
 .geneButton {
     color: black;
 }
+
+.badgeContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    overflow: scroll;
+    min-height: 100px;
+}
+  
+.geneBadge {
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    height: 18px;
+}
+
+.ellipsis {
+    margin-left: 4px;
+    font-size: 14px;
+}
+
+.selectedContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    overflow: scroll;
+}
+
+.selectedPoint {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.selectedPoint > .span {
+    font-family: monospace;
+}
+
+.selectedPoint > div {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.colorCircle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }

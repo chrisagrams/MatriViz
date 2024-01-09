@@ -5,6 +5,7 @@ export interface DataPoint {
   y: number
   index: string
   score: number
+  color: string | null
 }
 
 export interface TooltipData {

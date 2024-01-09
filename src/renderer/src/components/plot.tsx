@@ -10,7 +10,7 @@ import useLasso from './lasso'
 import { DataPoint, TooltipData } from '../types'
 import styles from '../assets/plot.module.css'
 
-const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
+const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(data: DataPoint[]) => void; }): JSX.Element => {
   const [dimensions, setDimensions] = useState({
     width: window.innerHeight - 50,
     height: window.innerHeight - 50
@@ -51,21 +51,29 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
       const mouseX = event.clientX - svgRect.left;
       const mouseY = event.clientY - svgRect.top;
 
-      let newZoomLevel = event.deltaY > 0 ? zoomLevel / scaleFactor : zoomLevel * scaleFactor;
+      if (
+        mouseX >= 0 &&
+        mouseY >= 0 &&
+        mouseX <= svgRect.width &&
+        mouseY <= svgRect.height
+      ) 
+      {
+        let newZoomLevel = event.deltaY > 0 ? zoomLevel / scaleFactor : zoomLevel * scaleFactor;
 
-      const newTransformX = mouseX - (mouseX - transformX) * (newZoomLevel / zoomLevel);
-      const newTransformY = mouseY - (mouseY - transformY) * (newZoomLevel / zoomLevel);
-      setTransformX(newTransformX);
-      setTransformY(newTransformY);
+        const newTransformX = mouseX - (mouseX - transformX) * (newZoomLevel / zoomLevel);
+        const newTransformY = mouseY - (mouseY - transformY) * (newZoomLevel / zoomLevel);
+        setTransformX(newTransformX);
+        setTransformY(newTransformY);
 
-      if (newZoomLevel > 1) {
-        newZoomLevel = 1;
-        setTransformX(0);
-        setTransformY(0);
+        if (newZoomLevel > 1) {
+          newZoomLevel = 1;
+          setTransformX(0);
+          setTransformY(0);
+        }
+
+        console.log(newZoomLevel);
+        setZoomLevel(newZoomLevel);
       }
-
-      console.log(newZoomLevel);
-      setZoomLevel(newZoomLevel);
     };
 
     window.addEventListener('wheel', handleWheel);
@@ -86,6 +94,15 @@ const Plot = ({ data }: { data: DataPoint[] }): JSX.Element => {
      console.log('minScore:', minScore);
      console.log('maxScore:', maxScore);
   }, [data]);
+
+  useEffect(() => {
+    const sortedPoints = [...selectedPoints].sort((a, b) => b.score - a.score);
+    const modifiedPoints = sortedPoints.map((point) => ({
+      ...point,
+      color: colorScale(point.score),
+    }));    
+    onSelectedData(modifiedPoints);
+  }, [selectedPoints]);
 
   const { handleMouseDown, handleMouseMove, handleMouseUp, Lasso } = useLasso({
     data: data,
