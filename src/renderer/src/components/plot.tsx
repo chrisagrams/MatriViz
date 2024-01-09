@@ -167,7 +167,7 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
           left={tooltip.left}
           style={tooltipStyles}
         >
-          <b>Index:</b> {tooltip.data.index}
+          <b>Cell Name:</b> {tooltip.data.index}
           <br />
           <b>Score:</b> {tooltip.data.score}
         </TooltipWithBounds>

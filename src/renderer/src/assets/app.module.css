@@ -22,6 +22,39 @@
     justify-content: center;
 }
 
+.geneSearch {
+    margin-top: 10px;
+    position: relative;
+}
+  
+.geneSearch input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    margin: 10px 0;
+}
+  
+.searchResults {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    background-color: #fff;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.searchResultItem {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.searchResultItem:hover {
+    background-color: #f0f0f0;
+}
+
 .selectedGeneButton {
     color: blue;
 }
@@ -47,6 +80,21 @@
     margin-bottom: 8px;
     font-size: 14px;
     height: 18px;
+}
+
+.geneBadge > button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    padding: 0;
+    margin: auto;
+    padding-left: 10px;
+    font-size: 14px;
+
+}
+
+.geneBadge > button:hover {
+    cursor: pointer;
 }
 
 .ellipsis {

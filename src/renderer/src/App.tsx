@@ -3,6 +3,8 @@ import Plot from './components/plot'
 import styles from './assets/app.module.css'
 import { ColorRing } from 'react-loader-spinner';
 import categories from "../../../resources/enge_modified_category.json";
+import all from "../../../resources/enge_modified_all.json";
+
 import { DataPoint } from './types'
 
 const App = (): JSX.Element => {
@@ -12,20 +14,31 @@ const App = (): JSX.Element => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showAllGenes, setShowAllGenes] = useState(false);
   const [selectedData, setSelectedData] = useState<DataPoint[]>([]);
-
-  const toggleGene = (gene) => {
-    if (selectedGenes.includes(gene)) {
-      setSelectedGenes(selectedGenes.filter((selectedGene) => selectedGene !== gene));
-    } else {
-      setSelectedGenes([...selectedGenes, gene]);
-    }
-  };
+  const [searchInput, setSearchInput] = useState('');
+  const [searchResults, setSearchResults] = useState<string[]>([]);
 
   const handleCategoryChange = (event) => {
     const selectedCategory = event.target.value;
     setSelectedData([]);
     setSelectedGenes(categories[selectedCategory]);
     setSelectedCategory(selectedCategory);
+  };
+
+
+  const handleSearchInputChange = (event) => {
+    const inputValue = event.target.value;
+    setSearchInput(inputValue);
+
+    const results = all.filter((gene) =>
+      gene.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    setSearchResults(results);
+  };
+
+  const addSelectedGene = (gene) => {
+    setSelectedGenes([...selectedGenes, gene]);
+    setSearchInput('');
+    setSearchResults([]);
   };
 
   // Fetch and process the data
@@ -56,21 +69,14 @@ const App = (): JSX.Element => {
     setSelectedData(selectedData);
   }
 
+  const removeGene = (geneToRemove) => {
+    setSelectedGenes(selectedGenes.filter((gene) => gene !== geneToRemove));
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.panel}>
-        <h1>MatriViz</h1>
-        {/* <div>
-        {['SAMD11', 'HES4', 'CD44'].map((gene) => (
-          <button
-            key={gene}
-            onClick={() => toggleGene(gene)}
-            className={selectedGenes.includes(gene) ? styles.selectedGeneButton : styles.geneButton}
-          >
-            {gene}
-          </button>
-        ))}
-      </div> */}
+      <h1>MatriViz</h1>
       <h2>Category</h2>
       <select>
         <option value="">Kidney</option>
@@ -83,24 +89,45 @@ const App = (): JSX.Element => {
             </option>
           ))}
       </select>
-      
+
       <h2>Selected Genes</h2>
+      <div className={styles.geneSearch}>
+          <input
+            type="text"
+            placeholder="Search for a gene..."
+            value={searchInput}
+            onChange={handleSearchInputChange}
+          />
+          <div className={styles.searchResults}>
+            {searchResults.map((gene) => (
+              <div
+                key={gene}
+                className={styles.searchResultItem}
+                onClick={() => addSelectedGene(gene)}
+              >
+                {gene}
+              </div>
+            ))}
+          </div>
+      </div>
       <div className={styles.badgeContainer}>
         {showAllGenes
           ? selectedGenes.map((gene) => (
-              <span key={gene} className={styles.geneBadge}>
-                {gene}
-              </span>
+              <div key={gene} className={styles.geneBadge}>
+                <span>{gene}</span>
+                <button onClick={() => removeGene(gene)}>X</button>
+              </div>
             ))
           : <>
             {selectedGenes.slice(0, 10).map((gene) => (
-              <span key={gene} className={styles.geneBadge}>
-                {gene}
-              </span>
+              <div key={gene} className={styles.geneBadge}>
+                <span>{gene}</span>
+                <button onClick={() => removeGene(gene)}>X</button>
+              </div>
             ))}
             <span className={styles.ellipsis}>...</span>
           </>
-            }
+        }
       </div>
       {selectedGenes.length > 10 && (
         <button onClick={() => setShowAllGenes(!showAllGenes)}>
@@ -111,7 +138,7 @@ const App = (): JSX.Element => {
       <h2>Selected Points</h2>
       {selectedData.length > 0 && (
         <div className={styles.selectedPoint}>
-          <span>Index</span>
+          <span>Cell Name</span>
           <span>Score</span>
         </div>
       )}
