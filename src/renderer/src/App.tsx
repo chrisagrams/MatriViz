@@ -107,17 +107,19 @@ const App = (): JSX.Element => {
       <div className={styles.panel}>
       <h1>MatriViz</h1>
       <h2>Category</h2>
-      <select>
-        <option value="">Kidney</option>
-      </select>
-      <select onChange={handleCategoryChange} value={selectedCategory}>
-          <option value="">Category</option>
-          {Object.keys(categories).map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-      </select>
+      <div className={styles.categoryContainer}>
+        <select>
+          <option value="">Kidney</option>
+        </select>
+        <select onChange={handleCategoryChange} value={selectedCategory}>
+            <option value="">Category</option>
+            {Object.keys(categories).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+        </select>
+      </div>
 
       <h2>Selected Genes</h2>
       <div className={styles.geneSearch}>

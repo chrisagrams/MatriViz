@@ -22,6 +22,17 @@
     justify-content: center;
 }
 
+.categoryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.categoryContainer > select {
+    width: 100%;
+    padding: 8px;
+}
+
 .geneSearch {
     margin-top: 10px;
     position: relative;
