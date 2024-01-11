@@ -12,6 +12,7 @@ import { DataPoint } from './types'
 const App = (): JSX.Element => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [minorLoading, setMinorLoading] = useState(false) // Non-blocking loading
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
   const [selectedBadges, setSelectedBadges] = useState(['SAMD11', 'HES4', 'CD44']);
   const [singleToggle, setSingleToggle] = useState(false);
@@ -22,6 +23,7 @@ const App = (): JSX.Element => {
   const [searchResults, setSearchResults] = useState<string[]>([]);
 
   const handleCategoryChange = (event) => {
+    setMinorLoading(true);
     const selectedCategory = event.target.value;
     setSelectedData([]);
     setSelectedGenes(categories[selectedCategory]);
@@ -30,6 +32,7 @@ const App = (): JSX.Element => {
   };
 
   const handleBadgeClick = (badge) => {
+    setMinorLoading(true);
     const badgeElements = document.querySelectorAll(`.${styles.geneBadge}`);
 
     if (!singleToggle) {
@@ -64,6 +67,7 @@ const App = (): JSX.Element => {
   };
 
   const addSelectedGene = (gene) => {
+    setMinorLoading(true);
     setSelectedGenes([...selectedGenes, gene]);
     setSelectedBadges([...selectedGenes, gene]);
     setSearchInput('');
@@ -89,6 +93,7 @@ const App = (): JSX.Element => {
         }))
         setData(processedData)
         setLoading(false)
+        setMinorLoading(false)
       })
       .catch((error) => {
         console.error('Error fetching data:', error)
@@ -100,6 +105,7 @@ const App = (): JSX.Element => {
   }
 
   const removeGene = (geneToRemove) => {
+    setMinorLoading(true);
     setSelectedGenes(selectedGenes.filter((gene) => gene !== geneToRemove));
     setSelectedBadges(selectedGenes.filter((gene) => gene !== geneToRemove));
   };
@@ -177,21 +183,30 @@ const App = (): JSX.Element => {
       </div>
       </div>
       <div className={styles.plotArea}>
-        <div className="container">{loading ? 
-        <div className={styles.loading}>
-          <ColorRing
-          visible={true}
-          height="80"
-          width="80"
-          ariaLabel="blocks-loading"
-          wrapperStyle={{}}
-          wrapperClass="blocks-wrapper"
-          colors={['#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1']}
-          />
-          <p>Loading...</p>
+          {minorLoading && 
+            <div className={styles.minorLoading}>
+              <ColorRing
+                height="40"
+                width="40"
+                colors={['#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1']}
+              />
+            </div>
+          }
+          {loading ? 
+            <div className={styles.loading}>
+              <ColorRing
+              visible={true}
+              height="80"
+              width="80"
+              ariaLabel="blocks-loading"
+              wrapperStyle={{}}
+              wrapperClass="blocks-wrapper"
+              colors={['#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1']}
+              />
+              <p>Loading...</p>
+            </div>
+          : <Plot data={data} onSelectedData={handleSelectedData}/>}
         </div>
-         : <Plot data={data} onSelectedData={handleSelectedData}/>}</div>
-      </div>
     </div>
   )
 }

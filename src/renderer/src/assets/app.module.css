@@ -12,6 +12,7 @@
 }
 
 .plotArea {
+    position: relative;
     justify-self: flex-end;
     margin: auto;
 }
@@ -20,6 +21,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.minorLoading {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 
 .categoryContainer {
