@@ -3,10 +3,10 @@ import { Group } from '@visx/group'
 import { Circle } from '@visx/shape'
 import { scaleLinear } from '@visx/scale'
 import { LinearGradient } from '@visx/gradient'
-import { Text } from '@visx/text'
 import { TooltipWithBounds, defaultStyles as tooltipStyles } from '@visx/tooltip';
 import { GridRows, GridColumns } from '@visx/grid';
 import useLasso from './lasso'
+import Legend from './legend'
 import { DataPoint, TooltipData } from '../types'
 import styles from '../assets/plot.module.css'
 
@@ -22,6 +22,11 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
   const [minScore, setMinScore] = useState(0)
   const [maxScore, setMaxScore] = useState(0)
 
+  const [minColor, setMinColor] = useState('#ffff00')
+  const [maxColor, setMaxColor] = useState('#ff0000')
+
+  const [pointSize, setPointSize] = useState(4);
+
   const [transformX, setTransformX] = useState(0);
   const [transformY, setTransformY] = useState(0);
 
@@ -34,11 +39,10 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
     range: [(dimensions.height - transformY) / zoomLevel, (0 - transformY) / zoomLevel],
     domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
   })
-  
 
   const colorScale = scaleLinear<string>({
     domain: [minScore, maxScore],
-    range: ['#ffff00', '#ff0000'], // Yellow to Red
+    range: [minColor, maxColor],
   })
 
   useEffect(() => {
@@ -89,8 +93,10 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
   useEffect(() => {
      // Set the min and max score
      const scores = data.map((d) => d.score)
-     setMinScore(Math.min(...scores))
+    //  setMinScore(Math.min(...scores))
      setMaxScore(Math.max(...scores))
+    setMinScore(0);
+    // setMaxScore(50);
      console.log('minScore:', minScore);
      console.log('maxScore:', maxScore);
   }, [data]);
@@ -150,7 +156,7 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
               key={`point-${i}`}
               cx={xScale(point.x)}
               cy={yScale(point.y)}
-              r={2} // radius of point
+              r={pointSize} // radius of point
               fill={
                 selectedPoints.includes(point)
                   ? colorScale(point.score)
@@ -179,21 +185,14 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
         </TooltipWithBounds>
       )}
 
-      <svg
-        width={80}
-        height={100}
-        x={dimensions.width - 80} 
+      <Legend 
+        x={dimensions.width - 80}
         y={0}
-      >
-        <LinearGradient id="colorScale" from="#ff0000" to="#ffff00" vertical={true} />
-        <rect x={0} y={0} width={20} height={100} fill="url(#colorScale)" />
-        <Text x={25} y={10} fill="#000" fontSize={12}>
-          {maxScore.toFixed(3)}
-        </Text>
-        <Text x={25} y={100} fill="#000" fontSize={12}>
-          {minScore.toFixed(3)}
-        </Text>
-      </svg>
+        maxScore={maxScore}
+        minScore={minScore}
+        minColor={minColor}
+        maxColor={maxColor}
+      />
     </div>
   )
 }
