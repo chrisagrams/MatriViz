@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from '../assets/badge.module.css';
 
 const Badge = ({ gene, handleBadgeClick, removeGene }) => {
