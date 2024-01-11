@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Plot from './components/plot'
 import Badge from './components/badge'
+import Row from './components/row'
 import styles from './assets/app.module.css'
 import { ColorRing } from 'react-loader-spinner';
 import categories from "../../../resources/enge_modified_category.json";
@@ -163,20 +164,15 @@ const App = (): JSX.Element => {
       
       <h2>Selected Points</h2>
       {selectedData.length > 0 && (
-        <div className={styles.selectedPoint}>
-          <span>Cell Name</span>
-          <span>Score</span>
-        </div>
+        <Row index={<b>Index</b>} score={<b>Score</b>} color={"white"}></Row> // Header
       )}
       <div className={styles.selectedContainer}>
         {selectedData.map((point, i) => (
-          <div className={styles.selectedPoint} key={`selected-point-${i}`}>
-            <span>{point.index}</span>
-            <div>
-              <span>{point.score.toFixed(3)}</span>
-              <div className={styles.colorCircle} style={{ backgroundColor: point.color || "white"}}></div>
-            </div>
-          </div>
+          <Row key={`selected-point-${i}`}
+               index={point.index}
+               score={point.score.toFixed(3)}
+               color={point.color}  
+          />
         ))}
       </div>
       </div>
