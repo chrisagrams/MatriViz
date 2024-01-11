@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Plot from './components/plot'
+import Badge from './components/badge'
 import styles from './assets/app.module.css'
 import { ColorRing } from 'react-loader-spinner';
 import categories from "../../../resources/enge_modified_category.json";
@@ -144,17 +145,11 @@ const App = (): JSX.Element => {
       <div className={styles.badgeContainer}>
         {showAllGenes
           ? selectedGenes.map((gene) => (
-              <div key={gene} className={styles.geneBadge} data-key={gene}>
-                <span onClick={() => handleBadgeClick(gene)}>{gene}</span>
-                <button onClick={() => removeGene(gene)}>X</button>
-              </div>
+              <Badge key={gene} gene={gene} handleBadgeClick={handleBadgeClick} removeGene={removeGene} />
             ))
           : <>
             {selectedGenes.slice(0, 10).map((gene) => (
-              <div key={gene} className={styles.geneBadge} data-key={gene}>
-                <span onClick={() => handleBadgeClick(gene)}>{gene}</span>
-                <button onClick={() => removeGene(gene)}>X</button>
-              </div>
+              <Badge key={gene} gene={gene} handleBadgeClick={handleBadgeClick} removeGene={removeGene} />
             ))}
             <span className={styles.ellipsis}>...</span>
           </>
