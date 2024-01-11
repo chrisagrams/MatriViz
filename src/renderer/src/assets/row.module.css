@@ -1,11 +1,3 @@
-.selectedContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    overflow: scroll;
-}
-
 .selectedPoint {
     display: flex;
     flex-direction: row;

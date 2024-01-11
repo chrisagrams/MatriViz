@@ -91,3 +91,11 @@
     margin-left: 4px;
     font-size: 14px;
 }
+
+.selectedContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    overflow: scroll;
+}
