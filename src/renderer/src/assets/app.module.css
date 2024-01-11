@@ -12,7 +12,6 @@
 }
 
 .plotArea {
-    position: relative;
     justify-self: flex-end;
     margin: auto;
 }

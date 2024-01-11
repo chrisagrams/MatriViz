@@ -25,7 +25,7 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
   const [minColor, setMinColor] = useState('#ffff00')
   const [maxColor, setMaxColor] = useState('#ff0000')
 
-  const [pointSize, setPointSize] = useState(4);
+  const [pointSize, setPointSize] = useState(2);
 
   const [transformX, setTransformX] = useState(0);
   const [transformY, setTransformY] = useState(0);
@@ -95,7 +95,7 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
      const scores = data.map((d) => d.score)
     //  setMinScore(Math.min(...scores))
      setMaxScore(Math.max(...scores))
-    setMinScore(0);
+    // setMinScore(0);
     // setMaxScore(50);
      console.log('minScore:', minScore);
      console.log('maxScore:', maxScore);
