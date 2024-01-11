@@ -9,7 +9,7 @@ const Legend = ({ x, y, maxScore, minScore, minColor, maxColor }) => {
           x={x}
           y={y}
         >
-            <LinearGradient id="colorScale" from={minColor} to={maxColor} vertical={true} />
+            <LinearGradient id="colorScale" from={maxColor} to={minColor} vertical={true} />
             <rect x={0} y={0} width={20} height={100} fill="url(#colorScale)" />
             <Text x={25} y={10} fill="#000" fontSize={12}>
             {maxScore.toFixed(3)}

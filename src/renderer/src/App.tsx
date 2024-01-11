@@ -91,6 +91,9 @@ const App = (): JSX.Element => {
           index: d.index,
           score: selectedBadges.reduce((acc, gene) => acc + d[gene], 0),
         }))
+
+        // Sort the data by score to show the highest scoring points on top
+        processedData.sort((a, b) => a.score - b.score);
         setData(processedData)
         setLoading(false)
         setMinorLoading(false)
