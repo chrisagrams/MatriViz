@@ -3,4 +3,5 @@ dist
 out
 *.log*
 *.feather
+*.parquet
 .DS_Store

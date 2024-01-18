@@ -35,7 +35,22 @@ if (process.contextIsolated) {
             }
           })
         })
-      }
+      },
+      
+    })
+    contextBridge.exposeInMainWorld('parquet', {
+      queryParquetFile: (filePath: string, query: string[] = []) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send('query-parquet-file', filePath, query)
+          ipcRenderer.once('query-parquet-file-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
     })
   } catch (error) {
     console.error(error)

@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { loadFeatherFile, queryGlobalTable, tableToJson } from './feather'
+import { queryParquetFile } from './parquet'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -90,3 +91,12 @@ ipcMain.on('query-global-table', (event, query?: { select?: string[] }) => {
     event.reply('query-global-table-reply', error)
   }
 })
+
+ipcMain.on('query-parquet-file', async (event, filePath: string, query?: string[]) => {
+  try {
+    const json = await queryParquetFile(filePath, query)
+    event.reply('query-parquet-file-reply', json)
+  } catch (error) {
+    event.reply('query-parquet-file-reply', error)
+  }
+});

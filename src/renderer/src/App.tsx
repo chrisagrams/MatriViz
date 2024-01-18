@@ -10,7 +10,7 @@ import all from "../../../resources/enge_modified_all.json";
 import { DataPoint } from './types'
 
 const App = (): JSX.Element => {
-  const [data, setData] = useState([])
+  const [data, setData] = useState<DataPoint[]>([]);
   const [loading, setLoading] = useState(true)
   const [minorLoading, setMinorLoading] = useState(false) // Non-blocking loading
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
@@ -77,19 +77,16 @@ const App = (): JSX.Element => {
 
   // Fetch and process the data
   useEffect(() => {
-    // setLoading(true)
-    window.feather
-      .loadFeatherFile('./resources/enge_modified_nocomp.feather')
-      .then(() => {
-        return window.feather.queryGlobalTable({ select: [...selectedBadges, 'umap_1', 'umap_2', 'index'] })
-      })
+    setLoading(true)
+    window.parquet.queryParquetFile('./resources/enge_modified_nocomp.parquet', [...selectedBadges, 'umap_1', 'umap_2', 'index'] )
       .then((fetchedData) => {
         console.log('Data fetched:', fetchedData)
         const processedData = fetchedData.map((d) => ({
-          x: d.umap_1,
-          y: d.umap_2,
+          x: parseFloat(d.umap_1),
+          y: parseFloat(d.umap_2),
           index: d.index,
-          score: selectedBadges.reduce((acc, gene) => acc + d[gene], 0),
+          score: selectedBadges.reduce((acc, gene) => acc + parseFloat(d[gene]), 0),
+          color: null, // Will be set later
         }))
 
         // Sort the data by score to show the highest scoring points on top
