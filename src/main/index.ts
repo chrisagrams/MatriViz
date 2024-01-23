@@ -1,8 +1,11 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+
 import { loadFeatherFile, queryGlobalTable, tableToJson } from './feather'
-import { queryParquetFile } from './parquet'
+import { queryParquetFile, getAllColumns } from './parquet'
+import { getResourceList, getCategories } from './resources'
+
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -98,5 +101,32 @@ ipcMain.on('query-parquet-file', async (event, filePath: string, query?: string[
     event.reply('query-parquet-file-reply', json)
   } catch (error) {
     event.reply('query-parquet-file-reply', error)
+  }
+});
+
+ipcMain.on('get-parquet-columns', async (event, filePath: string) => {
+  try {
+    const columns = await getAllColumns(filePath)
+    event.reply('get-parquet-columns-reply', columns)
+  } catch (error) {
+    event.reply('get-parquet-columns-reply', error)
+  }
+});
+
+ipcMain.on('get-resource-list', async (event, dirPath: string) => {
+  try {
+    const files = await getResourceList(dirPath)
+    event.reply('get-resource-list-reply', files)
+  } catch (error) {
+    event.reply('get-resource-list-reply', error)
+  }
+});
+
+ipcMain.on('get-resource-categories', async (event, path: string) => {
+  try {
+    const categories = await getCategories(path)
+    event.reply('get-resource-categories-reply', categories)
+  } catch (error) {
+    event.reply('get-resource-categories-reply', error)
   }
 });

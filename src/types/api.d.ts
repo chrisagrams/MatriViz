@@ -1,3 +1,7 @@
+/* Global definitions */
+
+import { ResourceFile } from "./types"
+
 declare global {
   interface Window {
     feather: {
@@ -6,6 +10,11 @@ declare global {
     }
     parquet: {
       queryParquetFile: (filePath: string, query: string[] = []) => Promise<any[]>
+      getParquetColumns: (filePath: string) => Promise<string[]>
+    }
+    resources: {
+      getResourceList: (dirPath: string) => Promise<ResourceFile[]>
+      getResourceCategories: (path: string) => Promise<any>
     }
   }
 }

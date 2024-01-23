@@ -4,15 +4,19 @@ import Badge from './components/badge'
 import Row from './components/row'
 import styles from './assets/app.module.css'
 import { ColorRing } from 'react-loader-spinner';
-import categories from "../../../resources/enge_modified_category.json";
-import all from "../../../resources/enge_modified_all.json";
-
 import { DataPoint } from './types'
+import { ResourceFile } from '../../types/types';
 
 const App = (): JSX.Element => {
+  const [resourcesDir, setResourcesDir] = useState<string>("./resources/"); // TODO: Make this configurable
+  const [resources, setResources] = useState<ResourceFile[]>([]);
+  const [currentResource, setCurrentResource] = useState<ResourceFile>();
+  const [categories, setCategories] = useState({} as any);
+  const [allGenes, setAllGenes] = useState([] as string[]); // Columns from parquet file
+
   const [data, setData] = useState<DataPoint[]>([]);
   const [loading, setLoading] = useState(true)
-  const [minorLoading, setMinorLoading] = useState(false) // Non-blocking loading
+  const [minorLoading, setMinorLoading] = useState(false) // Use only for non-blocking loading
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
   const [selectedBadges, setSelectedBadges] = useState(['SAMD11', 'HES4', 'CD44']);
   const [singleToggle, setSingleToggle] = useState(false);
@@ -21,6 +25,45 @@ const App = (): JSX.Element => {
   const [selectedData, setSelectedData] = useState<DataPoint[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [searchResults, setSearchResults] = useState<string[]>([]);
+
+
+  const populateResources = () => {
+    window.resources.getResourceList(resourcesDir).then((files) => {
+      setResources(files as ResourceFile[]);
+      if (currentResource === undefined && files.length > 0) // If no resource is selected, select the first one
+        setCurrentResource(files[0]);
+      console.log(resources);
+    });
+  }
+
+  useEffect(() => {
+    populateResources();
+  }, [resourcesDir]);
+
+  useEffect(() => {
+    if (!currentResource) return;
+    window.resources.getResourceCategories(resourcesDir + currentResource.category_file)
+      .then((categories) => {
+      setCategories(categories);
+      console.log(categories);
+    });
+  }, [currentResource]);
+
+
+  useEffect(() => {
+    if (!currentResource) return;
+    window.parquet.getParquetColumns(resourcesDir + currentResource.parquet_file)
+      .then((columns) => {
+        setAllGenes(columns);
+        console.log(columns);
+      });
+  }, [currentResource]);
+
+  const handleResourceChange = (event) => {
+    const selectedResource = event.target.value;
+    setCurrentResource(resources.find((resource) => resource.category_name === selectedResource));
+    console.log("currentResource:" + currentResource);
+  }
 
   const handleCategoryChange = (event) => {
     setMinorLoading(true);
@@ -60,7 +103,7 @@ const App = (): JSX.Element => {
     const inputValue = event.target.value;
     setSearchInput(inputValue);
 
-    const results = all.filter((gene) =>
+    const results = allGenes.filter((gene) =>
       gene.toLowerCase().includes(inputValue.toLowerCase())
     );
     setSearchResults(results);
@@ -78,7 +121,11 @@ const App = (): JSX.Element => {
   // Fetch and process the data
   useEffect(() => {
     setLoading(true)
-    window.parquet.queryParquetFile('./resources/enge_modified_nocomp.parquet', [...selectedBadges, 'umap_1', 'umap_2', 'index'] )
+    if (!currentResource) return;
+    window.parquet.queryParquetFile(
+      resourcesDir + currentResource.parquet_file, // Path
+      [...selectedBadges, 'umap_1', 'umap_2', 'index'] // Query
+      )
       .then((fetchedData) => {
         console.log('Data fetched:', fetchedData)
         const processedData = fetchedData.map((d) => ({
@@ -98,7 +145,7 @@ const App = (): JSX.Element => {
       .catch((error) => {
         console.error('Error fetching data:', error)
       })
-  }, [selectedBadges])
+  }, [selectedBadges, currentResource])
 
   const handleSelectedData = (selectedData) => {
     setSelectedData(selectedData);
@@ -115,10 +162,14 @@ const App = (): JSX.Element => {
       <div className={styles.panel}>
       <h1>MatriViz</h1>
       <h2>Category</h2>
-      <div className={styles.categoryContainer}>
-        <select>
-          <option value="">Kidney</option>
-        </select>
+      <div className={styles.categoryContainer} >
+        <select onClick={populateResources} onChange={handleResourceChange}>
+          {resources.map((resource) => (
+            <option key={resource.category_name} value={resource.category_name}>
+              {resource.category_description} 
+            </option>
+          ))}
+       </select>
         <select onChange={handleCategoryChange} value={selectedCategory}>
             <option value="">Category</option>
             {Object.keys(categories).map((category) => (

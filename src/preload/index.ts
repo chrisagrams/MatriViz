@@ -51,6 +51,44 @@ if (process.contextIsolated) {
           })
         })
       },
+      getParquetColumns: (filePath: string) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send('get-parquet-columns', filePath)
+          ipcRenderer.once('get-parquet-columns-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
+    })
+    contextBridge.exposeInMainWorld('resources', {
+      getResourceList: (dirPath: string) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send('get-resource-list', dirPath)
+          ipcRenderer.once('get-resource-list-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
+      getResourceCategories: (path: string) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send('get-resource-categories', path)
+          ipcRenderer.once('get-resource-categories-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
     })
   } catch (error) {
     console.error(error)

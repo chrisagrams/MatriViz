@@ -5,3 +5,4 @@ out
 *.feather
 *.parquet
 .DS_Store
+resources/*

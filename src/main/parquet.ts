@@ -18,3 +18,16 @@ export const queryParquetFile = (filePath: string, query: string[] = []): Promis
       }
     });
   };
+
+export const getAllColumns = (filePath: string): Promise<string[]> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const reader = await parquet.ParquetReader.openFile(filePath);
+      const schema = reader.getSchema();
+      const columns = schema.fieldList.map(field => field.name);
+      resolve(columns);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
