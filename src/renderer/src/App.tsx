@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react'
+import { ColorRing } from 'react-loader-spinner';
+
+/* Components */
 import Plot from './components/plot'
 import Badge from './components/badge'
 import Row from './components/row'
+
+/* Styles */
 import styles from './assets/app.module.css'
-import { ColorRing } from 'react-loader-spinner';
+
+/* Types */
 import { DataPoint } from './types'
 import { ResourceFile } from '../../types/types';
 
