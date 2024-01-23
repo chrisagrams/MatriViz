@@ -126,32 +126,46 @@ const App = (): JSX.Element => {
 
   // Fetch and process the data
   useEffect(() => {
-    setLoading(true)
-    if (!currentResource) return;
-    window.parquet.queryParquetFile(
-      resourcesDir + currentResource.parquet_file, // Path
-      [...selectedBadges, 'umap_1', 'umap_2', 'index'] // Query
-      )
-      .then((fetchedData) => {
-        console.log('Data fetched:', fetchedData)
-        const processedData = fetchedData.map((d) => ({
+    const fetchData = async () => {
+      setLoading(true);
+      if (!currentResource) return;
+  
+      try {
+        // Fetch Parquet file data
+        const fetchedData = await window.parquet.queryParquetFile(
+          resourcesDir + currentResource.parquet_file,
+          [...selectedBadges, 'umap_1', 'umap_2', 'index']
+        );
+        console.log('Data fetched:', fetchedData);
+  
+        let processedData = fetchedData.map((d) => ({
           x: parseFloat(d.umap_1),
           y: parseFloat(d.umap_2),
           index: d.index,
           score: selectedBadges.reduce((acc, gene) => acc + parseFloat(d[gene]), 0),
           color: null, // Will be set later
-        }))
-
+        }));
+  
         // Sort the data by score to show the highest scoring points on top
         processedData.sort((a, b) => a.score - b.score);
-        setData(processedData)
-        setLoading(false)
-        setMinorLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error)
-      })
-  }, [selectedBadges, currentResource])
+  
+        setData(processedData);
+        setLoading(false);
+        setMinorLoading(false);
+  
+        // Fetch the centroid data
+        const centroidData = await window.parquet.queryParquetFile(
+          resourcesDir + currentResource.centroid_file,
+          ['cen_x', 'cen_y', 'Type']
+        );
+        console.log("Centroid data fetched:", centroidData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, [selectedBadges, currentResource]);
 
   const handleSelectedData = (selectedData) => {
     setSelectedData(selectedData);
