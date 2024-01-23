@@ -5,4 +5,5 @@ out
 *.feather
 *.parquet
 .DS_Store
-resources/*
+resources/*.json
+resources/*.zip
