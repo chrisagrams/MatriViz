@@ -8,6 +8,13 @@ export interface DataPoint {
   color: string | null
 }
 
+export interface LabelPoint {
+  x: number
+  y: number
+  label: string
+  color: string | null
+}
+
 export interface TooltipData {
   top: number,
   left: number,

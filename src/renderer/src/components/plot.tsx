@@ -7,10 +7,14 @@ import { TooltipWithBounds, defaultStyles as tooltipStyles } from '@visx/tooltip
 import { GridRows, GridColumns } from '@visx/grid';
 import useLasso from './lasso'
 import Legend from './legend'
-import { DataPoint, TooltipData } from '../types'
+import { DataPoint, LabelPoint, TooltipData } from '../types'
 import styles from '../assets/plot.module.css'
 
-const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(data: DataPoint[]) => void; }): JSX.Element => {
+const Plot = ({ data, labels,  onSelectedData }: { 
+    data: DataPoint[],
+    labels: LabelPoint[],
+    onSelectedData:(data: DataPoint[]) => void; 
+  }): JSX.Element => {
   const [dimensions, setDimensions] = useState({
     width: window.innerHeight - 50,
     height: window.innerHeight - 50
@@ -168,6 +172,15 @@ const Plot = ({ data, onSelectedData }: { data: DataPoint[], onSelectedData:(dat
               onMouseEnter={(event) => handleMouseEnter(event, point)}
               onMouseLeave={handleMouseLeave}
             />
+          ))}
+          {labels?.map((label, i) => (
+            <text
+              x={xScale(label.x)}
+              y={yScale(label.y)}
+              className={styles.label}
+            >
+            {label.label}
+            </text>
           ))}
           <Lasso />
         </Group>

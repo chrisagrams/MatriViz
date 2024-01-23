@@ -10,7 +10,7 @@ import Row from './components/row'
 import styles from './assets/app.module.css'
 
 /* Types */
-import { DataPoint } from './types'
+import { DataPoint, LabelPoint } from './types'
 import { ResourceFile } from '../../types/types';
 
 const App = (): JSX.Element => {
@@ -21,6 +21,8 @@ const App = (): JSX.Element => {
   const [allGenes, setAllGenes] = useState([] as string[]); // Columns from parquet file
 
   const [data, setData] = useState<DataPoint[]>([]);
+  const [labels, setLabels] = useState<LabelPoint[]>([]);
+
   const [loading, setLoading] = useState(true)
   const [minorLoading, setMinorLoading] = useState(false) // Use only for non-blocking loading
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
@@ -158,7 +160,15 @@ const App = (): JSX.Element => {
           resourcesDir + currentResource.centroid_file,
           ['cen_x', 'cen_y', 'Type']
         );
-        console.log("Centroid data fetched:", centroidData);
+
+        let processedCentroidData = centroidData.map((d) => ({
+          x: parseFloat(d.cen_x),
+          y: parseFloat(d.cen_y),
+          label: d.Type,
+          color: null, // Not currently implemented
+        }));
+        setLabels(processedCentroidData);
+        console.log('Centroid data fetched:', processedCentroidData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -276,7 +286,7 @@ const App = (): JSX.Element => {
               />
               <p>Loading...</p>
             </div>
-          : <Plot data={data} onSelectedData={handleSelectedData}/>}
+          : <Plot data={data} labels={labels} onSelectedData={handleSelectedData}/>}
         </div>
     </div>
   )
