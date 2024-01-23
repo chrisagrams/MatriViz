@@ -25,6 +25,7 @@ const App = (): JSX.Element => {
 
   const [loading, setLoading] = useState(true)
   const [minorLoading, setMinorLoading] = useState(false) // Use only for non-blocking loading
+
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
   const [selectedBadges, setSelectedBadges] = useState(['SAMD11', 'HES4', 'CD44']);
   const [singleToggle, setSingleToggle] = useState(false);
@@ -188,6 +189,7 @@ const App = (): JSX.Element => {
   };
 
   return (
+    <>
     <div className={styles.container}>
       <div className={styles.panel}>
       <h1>MatriViz</h1>
@@ -289,6 +291,7 @@ const App = (): JSX.Element => {
           : <Plot data={data} labels={labels} onSelectedData={handleSelectedData}/>}
         </div>
     </div>
+    </>
   )
 }
 

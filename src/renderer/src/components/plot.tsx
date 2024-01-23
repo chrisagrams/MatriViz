@@ -1,13 +1,27 @@
 import { useState, useEffect, useRef } from 'react'
+
+/* Visx */
 import { Group } from '@visx/group'
 import { Circle } from '@visx/shape'
 import { scaleLinear } from '@visx/scale'
 import { LinearGradient } from '@visx/gradient'
-import { TooltipWithBounds, defaultStyles as tooltipStyles } from '@visx/tooltip';
+import { TooltipWithBounds,
+        defaultStyles as tooltipStyles
+       } from '@visx/tooltip';
 import { GridRows, GridColumns } from '@visx/grid';
+
+/* Lucide */
+import { Settings } from 'lucide-react';
+
+/* Components */
 import useLasso from './lasso'
 import Legend from './legend'
+import PlotOptions from './plotOptions'
+
+/* Types */
 import { DataPoint, LabelPoint, TooltipData } from '../types'
+
+/* Styles */
 import styles from '../assets/plot.module.css'
 
 const Plot = ({ data, labels,  onSelectedData }: { 
@@ -23,16 +37,23 @@ const Plot = ({ data, labels,  onSelectedData }: {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([]);
   const [tooltip, setTooltip] = useState<TooltipData>();
-  const [minScore, setMinScore] = useState(0)
-  const [maxScore, setMaxScore] = useState(0)
 
-  const [minColor, setMinColor] = useState('#ffff00')
-  const [maxColor, setMaxColor] = useState('#ff0000')
+  const [minScore, setMinScore] = useState(0)
+  const [autoMinScore, setAutoMinScore] = useState(false)
+  const [maxScore, setMaxScore] = useState(10)
+  const [autoMaxScore, setAutoMaxScore] = useState(true)
+
+  const [minColor, setMinColor] = useState<string>('#ffff00')
+  const [maxColor, setMaxColor] = useState<string>('#ff0000')
 
   const [pointSize, setPointSize] = useState(2);
 
   const [transformX, setTransformX] = useState(0);
   const [transformY, setTransformY] = useState(0);
+
+  const [togglePlotOptions, setTogglePlotOptions] = useState(false);
+  const [toggleLabels, setToggleLabels] = useState(true);
+  const [toggleGridlines, setToggleGridlines] = useState(true);
 
   const xScale = scaleLinear({
     range: [(0 - transformX) / zoomLevel, (dimensions.width - transformX) / zoomLevel],
@@ -95,15 +116,21 @@ const Plot = ({ data, labels,  onSelectedData }: {
   }, [zoomLevel])
 
   useEffect(() => {
-     // Set the min and max score
-     const scores = data.map((d) => d.score)
-    //  setMinScore(Math.min(...scores))
+    // Set the min and max score
+    const scores = data.map((d) => d.score)
+     
+    if (autoMinScore)
+      setMinScore(Math.min(...scores))
+    else 
+      setMinScore(0);
+
+    if (autoMaxScore)
      setMaxScore(Math.max(...scores))
-    // setMinScore(0);
-    // setMaxScore(50);
-     console.log('minScore:', minScore);
-     console.log('maxScore:', maxScore);
-  }, [data]);
+    else 
+      setMaxScore(10);
+    console.log('minScore:', minScore);
+    console.log('maxScore:', maxScore);
+  }, [data, autoMinScore, autoMaxScore]);
 
   useEffect(() => {
     const sortedPoints = [...selectedPoints].sort((a, b) => b.score - a.score);
@@ -134,7 +161,36 @@ const Plot = ({ data, labels,  onSelectedData }: {
   };
 
   return (
+    <>
+   {togglePlotOptions && 
+    <PlotOptions 
+      minColor={minColor}
+      maxColor={maxColor}
+      pointSize={pointSize}
+      toggleLabels={toggleLabels}
+      toggleGridlines={toggleGridlines}
+      minScore={minScore}
+      autoMinScore={autoMinScore}
+      maxScore={maxScore}
+      autoMaxScore={autoMaxScore}
+      setMinColor={setMinColor} 
+      setMaxColor={setMaxColor}
+      setPointSize={setPointSize}
+      setToggleLabels={setToggleLabels}
+      setToggleGridlines={setToggleGridlines}
+      setMinScore={setMinScore}
+      setAutoMinScore={setAutoMinScore}
+      setMaxScore={setMaxScore}
+      setAutoMaxScore={setAutoMaxScore}
+    />}
     <div className="container">
+      <div 
+        className={styles.settings}
+        onClick={(event) => setTogglePlotOptions(!togglePlotOptions)}
+      >
+        <p>Plot options </p>
+        <Settings/>
+      </div>
       <svg
         ref={svgContainerRef}
         width={dimensions.width}
@@ -145,17 +201,21 @@ const Plot = ({ data, labels,  onSelectedData }: {
       >
         <LinearGradient id="stroke" from="#6699ff" to="#9933cc" />
         <Group>
-          <GridRows
-            scale={yScale}
-            width={dimensions.width}
-            stroke="#e0e0e0"
-          />
-          <GridColumns
-            scale={xScale}
-            height={dimensions.height}
-            stroke="#e0e0e0"
-          />
-          {data?.map((point, i) => (
+          { toggleGridlines && 
+          <>
+            <GridRows
+              scale={yScale}
+              width={dimensions.width}
+              stroke="#e0e0e0"
+            />
+            <GridColumns
+              scale={xScale}
+              height={dimensions.height}
+              stroke="#e0e0e0"
+            />
+          </>
+          }
+          { data?.map((point, i) => (
             <Circle
               key={`point-${i}`}
               cx={xScale(point.x)}
@@ -173,7 +233,7 @@ const Plot = ({ data, labels,  onSelectedData }: {
               onMouseLeave={handleMouseLeave}
             />
           ))}
-          {labels?.map((label, i) => (
+          { toggleLabels && labels?.map((label, i) => (
             <text
               x={xScale(label.x)}
               y={yScale(label.y)}
@@ -186,7 +246,7 @@ const Plot = ({ data, labels,  onSelectedData }: {
         </Group>
       </svg>
 
-      {tooltip?.data && (
+      { tooltip?.data && (
         <TooltipWithBounds
           top={tooltip.top}
           left={tooltip.left}
@@ -207,6 +267,7 @@ const Plot = ({ data, labels,  onSelectedData }: {
         maxColor={maxColor}
       />
     </div>
+    </>
   )
 }
 
