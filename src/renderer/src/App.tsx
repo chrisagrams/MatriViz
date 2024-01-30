@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { ColorRing } from 'react-loader-spinner';
 
 /* Components */
 import Plot from './components/plot'
 import Badge from './components/badge'
 import Row from './components/row'
+import Loading from './components/loading'
 
 /* Styles */
 import styles from './assets/app.module.css'
@@ -130,7 +130,7 @@ const App = (): JSX.Element => {
   // Fetch and process the data
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      // setLoading(true);
       if (!currentResource) return;
   
       try {
@@ -267,27 +267,10 @@ const App = (): JSX.Element => {
       </div>
       <div className={styles.plotArea}>
           {minorLoading && 
-            <div className={styles.minorLoading}>
-              <ColorRing
-                height="40"
-                width="40"
-                colors={['#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1']}
-              />
-            </div>
+            <Loading className={styles.minorLoading} height={40} width={40} text={false}/>
           }
           {loading ? 
-            <div className={styles.loading}>
-              <ColorRing
-              visible={true}
-              height="80"
-              width="80"
-              ariaLabel="blocks-loading"
-              wrapperStyle={{}}
-              wrapperClass="blocks-wrapper"
-              colors={['#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1', '#5bb9e1']}
-              />
-              <p>Loading...</p>
-            </div>
+              <Loading className={styles.loading} height={80} width={80} text={true}/>
           : <Plot data={data} labels={labels} onSelectedData={handleSelectedData}/>}
         </div>
     </div>
