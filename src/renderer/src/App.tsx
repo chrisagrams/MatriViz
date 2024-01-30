@@ -27,8 +27,7 @@ const App = (): JSX.Element => {
   const [minorLoading, setMinorLoading] = useState(false) // Use only for non-blocking loading
 
   const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
-  const [selectedBadges, setSelectedBadges] = useState(['SAMD11', 'HES4', 'CD44']);
-  const [singleToggle, setSingleToggle] = useState(false);
+  const [highlightedGene, setHighlightedGene] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showAllGenes, setShowAllGenes] = useState(false);
   const [selectedData, setSelectedData] = useState<DataPoint[]>([]);
@@ -79,32 +78,18 @@ const App = (): JSX.Element => {
     const selectedCategory = event.target.value;
     setSelectedData([]);
     setSelectedGenes(categories[selectedCategory]);
-    setSelectedBadges(categories[selectedCategory]);
     setSelectedCategory(selectedCategory);
   };
 
   const handleBadgeClick = (badge) => {
     setMinorLoading(true);
-    const badgeElements = document.querySelectorAll(`.${styles.geneBadge}`);
 
-    if (!singleToggle) {
-      setSelectedBadges([badge]);
-      badgeElements.forEach((element) => {
-        if (element.dataset.key === badge) {
-          element.classList.add(styles.selectedBadge);
-        } else {
-          element.classList.remove(styles.selectedBadge);
-        }
-      })
+    if (highlightedGene == "") {
+      setHighlightedGene(badge);
     }
     else {
-      setSelectedBadges(selectedGenes);
-      badgeElements.forEach((element) => {
-        element.classList.remove(styles.selectedBadge);
-      });
+      setHighlightedGene("");
     }
-    
-    setSingleToggle(!singleToggle);
   };
 
 
@@ -121,7 +106,6 @@ const App = (): JSX.Element => {
   const addSelectedGene = (gene) => {
     setMinorLoading(true);
     setSelectedGenes([...selectedGenes, gene]);
-    setSelectedBadges([...selectedGenes, gene]);
     setSearchInput('');
     setSearchResults([]);
   };
@@ -137,15 +121,22 @@ const App = (): JSX.Element => {
         // Fetch Parquet file data
         const fetchedData = await window.parquet.queryParquetFile(
           resourcesDir + currentResource.parquet_file,
-          [...selectedBadges, 'umap_1', 'umap_2', 'index']
+          [...selectedGenes, 'umap_1', 'umap_2', 'index']
         );
         console.log('Data fetched:', fetchedData);
+
+        let selection: string[] = [];
+
+        if (highlightedGene != "")
+          selection = [ highlightedGene ];
+        else
+          selection = selectedGenes;
   
         let processedData = fetchedData.map((d) => ({
           x: parseFloat(d.umap_1),
           y: parseFloat(d.umap_2),
           index: d.index,
-          score: selectedBadges.reduce((acc, gene) => acc + parseFloat(d[gene]), 0),
+          score: selection.reduce((acc, gene) => acc + parseFloat(d[gene]), 0),
           color: null, // Will be set later
         }));
   
@@ -176,7 +167,7 @@ const App = (): JSX.Element => {
     };
   
     fetchData();
-  }, [selectedBadges, currentResource]);
+  }, [selectedGenes, currentResource, highlightedGene]);
 
   const handleSelectedData = (selectedData) => {
     setSelectedData(selectedData);
@@ -185,7 +176,6 @@ const App = (): JSX.Element => {
   const removeGene = (geneToRemove) => {
     setMinorLoading(true);
     setSelectedGenes(selectedGenes.filter((gene) => gene !== geneToRemove));
-    setSelectedBadges(selectedGenes.filter((gene) => gene !== geneToRemove));
   };
 
   return (
@@ -233,17 +223,15 @@ const App = (): JSX.Element => {
           </div>
       </div>
       <div className={styles.badgeContainer}>
-        {showAllGenes
-          ? selectedGenes.map((gene) => (
-              <Badge key={gene} gene={gene} handleBadgeClick={handleBadgeClick} removeGene={removeGene} />
-            ))
-          : <>
-            {selectedGenes.slice(0, 10).map((gene) => (
-              <Badge key={gene} gene={gene} handleBadgeClick={handleBadgeClick} removeGene={removeGene} />
-            ))}
-            <span className={styles.ellipsis}>...</span>
-          </>
-        }
+        { /* If showAllGenes is selected, map all. Otherwise, only map 10 */}
+        {selectedGenes.slice(0, showAllGenes ? selectedGenes.length : 10).map((gene) => (
+          <Badge gene={gene}
+                 handleBadgeClick={handleBadgeClick}
+                 removeGene={removeGene} 
+                 isHighlighted={highlightedGene === gene} 
+          />
+        ))}
+        {!showAllGenes && <span className={styles.ellipsis}>...</span>}
       </div>
       {selectedGenes.length > 10 && (
         <button onClick={() => setShowAllGenes(!showAllGenes)}>
@@ -270,8 +258,9 @@ const App = (): JSX.Element => {
             <Loading className={styles.minorLoading} height={40} width={40} text={false}/>
           }
           {loading ? 
-              <Loading className={styles.loading} height={80} width={80} text={true}/>
-          : <Plot data={data} labels={labels} onSelectedData={handleSelectedData}/>}
+            <Loading className={styles.loading} height={80} width={80} text={true}/>
+          : <Plot data={data} labels={labels} onSelectedData={handleSelectedData}/>
+          }
         </div>
     </div>
     </>

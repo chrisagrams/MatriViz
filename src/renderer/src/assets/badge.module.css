@@ -24,3 +24,8 @@
 .geneBadge > button:hover {
     cursor: pointer;
 }
+
+.highlighted {
+    background-color: yellow; 
+    color: black;
+}
