@@ -36,3 +36,17 @@ export interface UseLassoReturn {
   lassoPoints: [number, number][]
   isLassoActive: boolean
 }
+
+export interface PlotState {
+  minScore: number;
+  maxScore: number;
+  autoMinScore: boolean;
+  autoMaxScore: boolean;
+  minColor: string;
+  maxColor: string;
+  pointSize: number;
+  transformX: number;
+  transformY: number;
+  toggleLabels: boolean;
+  toggleGridlines: boolean;
+}

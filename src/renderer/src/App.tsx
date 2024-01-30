@@ -10,7 +10,7 @@ import Loading from './components/loading'
 import styles from './assets/app.module.css'
 
 /* Types */
-import { DataPoint, LabelPoint } from './types'
+import { DataPoint, LabelPoint, PlotState } from './types'
 import { ResourceFile } from '../../types/types';
 
 const App = (): JSX.Element => {
@@ -34,6 +34,19 @@ const App = (): JSX.Element => {
   const [searchInput, setSearchInput] = useState('');
   const [searchResults, setSearchResults] = useState<string[]>([]);
 
+  const [plotState, setPlotState] = useState<PlotState>({
+    minScore: 0,
+    maxScore: 10,
+    autoMinScore: false,
+    autoMaxScore: true,
+    minColor: '#ffff00',
+    maxColor: '#ff0000',
+    pointSize: 2,
+    transformX: 0,
+    transformY: 0,
+    toggleLabels: true,
+    toggleGridlines: true,
+  });
 
   const populateResources = () => {
     window.resources.getResourceList(resourcesDir).then((files) => {
@@ -259,7 +272,12 @@ const App = (): JSX.Element => {
           }
           {loading ? 
             <Loading className={styles.loading} height={80} width={80} text={true}/>
-          : <Plot data={data} labels={labels} onSelectedData={handleSelectedData}/>
+          : <Plot data={data}
+                  labels={labels}
+                  plotState={plotState}
+                  onSelectedData={handleSelectedData}
+                  setPlotState={(state) => setPlotState(state)}
+            />
           }
         </div>
     </div>

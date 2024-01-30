@@ -19,14 +19,16 @@ import Legend from './legend'
 import PlotOptions from './plotOptions'
 
 /* Types */
-import { DataPoint, LabelPoint, TooltipData } from '../types'
+import { DataPoint, LabelPoint, TooltipData, PlotState } from '../types'
 
 /* Styles */
 import styles from '../assets/plot.module.css'
 
-const Plot = ({ data, labels,  onSelectedData }: { 
+const Plot = ({ data, labels, plotState, setPlotState, onSelectedData }: { 
     data: DataPoint[],
     labels: LabelPoint[],
+    plotState: PlotState,
+    setPlotState: (plotState: PlotState) => void,
     onSelectedData:(data: DataPoint[]) => void; 
   }): JSX.Element => {
   const [dimensions, setDimensions] = useState({
@@ -38,36 +40,21 @@ const Plot = ({ data, labels,  onSelectedData }: {
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([]);
   const [tooltip, setTooltip] = useState<TooltipData>();
 
-  const [minScore, setMinScore] = useState(0)
-  const [autoMinScore, setAutoMinScore] = useState(false)
-  const [maxScore, setMaxScore] = useState(10)
-  const [autoMaxScore, setAutoMaxScore] = useState(true)
-
-  const [minColor, setMinColor] = useState<string>('#ffff00')
-  const [maxColor, setMaxColor] = useState<string>('#ff0000')
-
-  const [pointSize, setPointSize] = useState(2);
-
-  const [transformX, setTransformX] = useState(0);
-  const [transformY, setTransformY] = useState(0);
-
   const [togglePlotOptions, setTogglePlotOptions] = useState(false);
-  const [toggleLabels, setToggleLabels] = useState(true);
-  const [toggleGridlines, setToggleGridlines] = useState(true);
 
   const xScale = scaleLinear({
-    range: [(0 - transformX) / zoomLevel, (dimensions.width - transformX) / zoomLevel],
+    range: [(0 - plotState.transformX) / zoomLevel, (dimensions.width - plotState.transformX) / zoomLevel],
     domain: [Math.min(...data.map((d) => d.x)), Math.max(...data.map((d) => d.x))]
   })
   
   const yScale = scaleLinear({
-    range: [(dimensions.height - transformY) / zoomLevel, (0 - transformY) / zoomLevel],
+    range: [(dimensions.height - plotState.transformY) / zoomLevel, (0 - plotState.transformY) / zoomLevel],
     domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
   })
 
   const colorScale = scaleLinear<string>({
-    domain: [minScore, maxScore],
-    range: [minColor, maxColor],
+    domain: [plotState.minScore, plotState.maxScore],
+    range: [plotState.minColor, plotState.maxColor],
   })
 
   useEffect(() => {
@@ -89,15 +76,13 @@ const Plot = ({ data, labels,  onSelectedData }: {
       {
         let newZoomLevel = event.deltaY > 0 ? zoomLevel / scaleFactor : zoomLevel * scaleFactor;
 
-        const newTransformX = mouseX - (mouseX - transformX) * (newZoomLevel / zoomLevel);
-        const newTransformY = mouseY - (mouseY - transformY) * (newZoomLevel / zoomLevel);
-        setTransformX(newTransformX);
-        setTransformY(newTransformY);
+        const newTransformX = mouseX - (mouseX - plotState.transformX) * (newZoomLevel / zoomLevel);
+        const newTransformY = mouseY - (mouseY - plotState.transformY) * (newZoomLevel / zoomLevel);
+        setPlotState({...plotState, transformX: newTransformX, transformY: newTransformY })
 
         if (newZoomLevel > 1) {
           newZoomLevel = 1;
-          setTransformX(0);
-          setTransformY(0);
+          setPlotState({...plotState, transformX: 0, transformY: 0 })
         }
 
         console.log(newZoomLevel);
@@ -119,18 +104,18 @@ const Plot = ({ data, labels,  onSelectedData }: {
     // Set the min and max score
     const scores = data.map((d) => d.score)
      
-    if (autoMinScore)
-      setMinScore(Math.min(...scores))
+    if (plotState.autoMinScore)
+      setPlotState({...plotState, minScore: Math.min(...scores)})
     else 
-      setMinScore(0);
+      setPlotState({...plotState, minScore: 0})
 
-    if (autoMaxScore)
-     setMaxScore(Math.max(...scores))
+    if (plotState.autoMaxScore)
+      setPlotState({...plotState, maxScore: Math.max(...scores)})
     else 
-      setMaxScore(10);
-    console.log('minScore:', minScore);
-    console.log('maxScore:', maxScore);
-  }, [data, autoMinScore, autoMaxScore]);
+    setPlotState({...plotState, maxScore: 10})
+    console.log('minScore:', plotState.minScore);
+    console.log('maxScore:', plotState.minScore);
+  }, [data, plotState.autoMinScore, plotState.autoMaxScore]);
 
   useEffect(() => {
     const sortedPoints = [...selectedPoints].sort((a, b) => b.score - a.score);
@@ -164,29 +149,13 @@ const Plot = ({ data, labels,  onSelectedData }: {
     <>
    {togglePlotOptions && 
     <PlotOptions 
-      minColor={minColor}
-      maxColor={maxColor}
-      pointSize={pointSize}
-      toggleLabels={toggleLabels}
-      toggleGridlines={toggleGridlines}
-      minScore={minScore}
-      autoMinScore={autoMinScore}
-      maxScore={maxScore}
-      autoMaxScore={autoMaxScore}
-      setMinColor={setMinColor} 
-      setMaxColor={setMaxColor}
-      setPointSize={setPointSize}
-      setToggleLabels={setToggleLabels}
-      setToggleGridlines={setToggleGridlines}
-      setMinScore={setMinScore}
-      setAutoMinScore={setAutoMinScore}
-      setMaxScore={setMaxScore}
-      setAutoMaxScore={setAutoMaxScore}
+      plotState={plotState}
+      setPlotState={setPlotState}
     />}
     <div className="container">
       <div 
         className={styles.settings}
-        onClick={(event) => setTogglePlotOptions(!togglePlotOptions)}
+        onClick={() => setTogglePlotOptions(!togglePlotOptions)}
       >
         <p>Plot options </p>
         <Settings/>
@@ -201,7 +170,7 @@ const Plot = ({ data, labels,  onSelectedData }: {
       >
         <LinearGradient id="stroke" from="#6699ff" to="#9933cc" />
         <Group>
-          { toggleGridlines && 
+          { plotState.toggleGridlines && 
           <>
             <GridRows
               scale={yScale}
@@ -220,7 +189,7 @@ const Plot = ({ data, labels,  onSelectedData }: {
               key={`point-${i}`}
               cx={xScale(point.x)}
               cy={yScale(point.y)}
-              r={pointSize} // radius of point
+              r={plotState.pointSize} // radius of point
               fill={
                 selectedPoints.includes(point)
                   ? colorScale(point.score)
@@ -233,7 +202,7 @@ const Plot = ({ data, labels,  onSelectedData }: {
               onMouseLeave={handleMouseLeave}
             />
           ))}
-          { toggleLabels && labels?.map((label, i) => (
+          { plotState.toggleLabels && labels?.map((label) => (
             <text
               x={xScale(label.x)}
               y={yScale(label.y)}
@@ -261,10 +230,10 @@ const Plot = ({ data, labels,  onSelectedData }: {
       <Legend 
         x={dimensions.width - 80}
         y={0}
-        maxScore={maxScore}
-        minScore={minScore}
-        minColor={minColor}
-        maxColor={maxColor}
+        maxScore={plotState.maxScore}
+        minScore={plotState.minScore}
+        minColor={plotState.minColor}
+        maxColor={plotState.maxColor}
       />
     </div>
     </>
