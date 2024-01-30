@@ -76,17 +76,21 @@ const Plot = ({ data, labels, plotState, setPlotState, onSelectedData }: {
       {
         let newZoomLevel = event.deltaY > 0 ? zoomLevel / scaleFactor : zoomLevel * scaleFactor;
 
-        const newTransformX = mouseX - (mouseX - plotState.transformX) * (newZoomLevel / zoomLevel);
-        const newTransformY = mouseY - (mouseY - plotState.transformY) * (newZoomLevel / zoomLevel);
-        setPlotState({...plotState, transformX: newTransformX, transformY: newTransformY })
+        let newTransformX = mouseX - (mouseX - plotState.transformX) * (newZoomLevel / zoomLevel);
+        let newTransformY = mouseY - (mouseY - plotState.transformY) * (newZoomLevel / zoomLevel);
 
         if (newZoomLevel > 1) {
           newZoomLevel = 1;
-          setPlotState({...plotState, transformX: 0, transformY: 0 })
+          newTransformX = 0;
+          newTransformY = 0;
         }
-
-        console.log(newZoomLevel);
         setZoomLevel(newZoomLevel);
+
+        setPlotState({
+          ...plotState,
+          transformX: newTransformX,
+          transformY: newTransformY
+        });
       }
     };
 
@@ -98,7 +102,7 @@ const Plot = ({ data, labels, plotState, setPlotState, onSelectedData }: {
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [zoomLevel])
+  }, [zoomLevel, plotState])
 
   useEffect(() => {
     // Set the min and max score

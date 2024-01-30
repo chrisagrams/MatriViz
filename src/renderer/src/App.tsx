@@ -14,6 +14,9 @@ import { DataPoint, LabelPoint, PlotState } from './types'
 import { ResourceFile } from '../../types/types';
 
 const App = (): JSX.Element => {
+  const defaultMinColor = '#ffff00';
+  const defaultMaxColor = '#ff0000';
+
   const [resourcesDir, setResourcesDir] = useState<string>("./resources/"); // TODO: Make this configurable
   const [resources, setResources] = useState<ResourceFile[]>([]);
   const [currentResource, setCurrentResource] = useState<ResourceFile>();
@@ -39,8 +42,8 @@ const App = (): JSX.Element => {
     maxScore: 10,
     autoMinScore: false,
     autoMaxScore: true,
-    minColor: '#ffff00',
-    maxColor: '#ff0000',
+    minColor: defaultMinColor,
+    maxColor: defaultMaxColor,
     pointSize: 2,
     transformX: 0,
     transformY: 0,
@@ -99,9 +102,11 @@ const App = (): JSX.Element => {
 
     if (highlightedGene == "") {
       setHighlightedGene(badge);
+      setPlotState({...plotState, minColor: "grey", maxColor: "purple"})
     }
     else {
       setHighlightedGene("");
+      setPlotState({...plotState, minColor: defaultMinColor, maxColor: defaultMaxColor})
     }
   };
 
