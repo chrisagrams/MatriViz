@@ -106,21 +106,24 @@ const Plot = ({ data, labels, plotState, setPlotState, onSelectedData }: {
 
   useEffect(() => {
     // Set the min and max score
-    const scores = data.map((d) => d.score)
-     
+    const scores = data.map((d) => d.score);
+    let newMinScore = plotState.minScore;
+    let newMaxScore = plotState.maxScore;
+  
     if (plotState.autoMinScore)
-      setPlotState({...plotState, minScore: Math.min(...scores)})
+      newMinScore = Math.min(...scores);
     else 
-      setPlotState({...plotState, minScore: 0})
-
+      newMinScore = 0;
+  
     if (plotState.autoMaxScore)
-      setPlotState({...plotState, maxScore: Math.max(...scores)})
+      newMaxScore = Math.max(...scores);
     else 
-    setPlotState({...plotState, maxScore: 10})
-    console.log('minScore:', plotState.minScore);
-    console.log('maxScore:', plotState.minScore);
+      newMaxScore = 10;
+  
+    setPlotState({...plotState, minScore: newMinScore, maxScore: newMaxScore});
   }, [data, plotState.autoMinScore, plotState.autoMaxScore]);
 
+  
   useEffect(() => {
     const sortedPoints = [...selectedPoints].sort((a, b) => b.score - a.score);
     const modifiedPoints = sortedPoints.map((point) => ({
