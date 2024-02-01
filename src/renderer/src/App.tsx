@@ -104,10 +104,10 @@ const App = (): JSX.Element => {
 
     if (highlightedGene == '') {
       setHighlightedGene(badge)
-      setPlotState({ ...plotState, minColor: 'grey', maxColor: 'purple' })
+      setPlotState({ ...plotState, minColor: 'grey', maxColor: 'yellow', autoMinScore: true})
     } else {
       setHighlightedGene('')
-      setPlotState({ ...plotState, minColor: defaultMinColor, maxColor: defaultMaxColor })
+      setPlotState({ ...plotState, minColor: defaultMinColor, maxColor: defaultMaxColor, autoMinScore: false })
     }
   }
 
