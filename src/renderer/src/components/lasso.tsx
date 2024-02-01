@@ -21,10 +21,7 @@ const useLasso = ({ data, xScale, yScale, onSelection }: UseLassoProps): UseLass
       const updatedLassoPoints: [number, number][] =
         lassoPoints.length > 1 ? lassoPoints.slice(0, -1) : lassoPoints
 
-      const newPoint: [number, number] = [
-        event.clientX - left,
-        event.clientY - top,
-      ]
+      const newPoint: [number, number] = [event.clientX - left, event.clientY - top]
 
       const newPoints: [number, number][] = [...updatedLassoPoints, newPoint]
 

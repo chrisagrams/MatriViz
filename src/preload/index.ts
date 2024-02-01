@@ -35,8 +35,7 @@ if (process.contextIsolated) {
             }
           })
         })
-      },
-      
+      }
     })
     contextBridge.exposeInMainWorld('parquet', {
       queryParquetFile: (filePath: string, query: string[] = []) => {
@@ -62,7 +61,7 @@ if (process.contextIsolated) {
             }
           })
         })
-      },
+      }
     })
     contextBridge.exposeInMainWorld('resources', {
       getResourceList: (dirPath: string) => {
@@ -88,7 +87,7 @@ if (process.contextIsolated) {
             }
           })
         })
-      },
+      }
     })
   } catch (error) {
     console.error(error)

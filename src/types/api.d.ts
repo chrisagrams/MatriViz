@@ -1,6 +1,6 @@
 /* Global definitions */
 
-import { ResourceFile } from "./types"
+import { ResourceFile } from './types'
 
 declare global {
   interface Window {

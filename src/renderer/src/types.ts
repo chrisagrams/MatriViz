@@ -16,8 +16,8 @@ export interface LabelPoint {
 }
 
 export interface TooltipData {
-  top: number,
-  left: number,
+  top: number
+  left: number
   data: DataPoint | null
 }
 
@@ -38,15 +38,15 @@ export interface UseLassoReturn {
 }
 
 export interface PlotState {
-  minScore: number;
-  maxScore: number;
-  autoMinScore: boolean;
-  autoMaxScore: boolean;
-  minColor: string;
-  maxColor: string;
-  pointSize: number;
-  transformX: number;
-  transformY: number;
-  toggleLabels: boolean;
-  toggleGridlines: boolean;
+  minScore: number
+  maxScore: number
+  autoMinScore: boolean
+  autoMaxScore: boolean
+  minColor: string
+  maxColor: string
+  pointSize: number
+  transformX: number
+  transformY: number
+  toggleLabels: boolean
+  toggleGridlines: boolean
 }

@@ -102,7 +102,7 @@ ipcMain.on('query-parquet-file', async (event, filePath: string, query?: string[
   } catch (error) {
     event.reply('query-parquet-file-reply', error)
   }
-});
+})
 
 ipcMain.on('get-parquet-columns', async (event, filePath: string) => {
   try {
@@ -111,7 +111,7 @@ ipcMain.on('get-parquet-columns', async (event, filePath: string) => {
   } catch (error) {
     event.reply('get-parquet-columns-reply', error)
   }
-});
+})
 
 ipcMain.on('get-resource-list', async (event, dirPath: string) => {
   try {
@@ -120,7 +120,7 @@ ipcMain.on('get-resource-list', async (event, dirPath: string) => {
   } catch (error) {
     event.reply('get-resource-list-reply', error)
   }
-});
+})
 
 ipcMain.on('get-resource-categories', async (event, path: string) => {
   try {
@@ -129,4 +129,4 @@ ipcMain.on('get-resource-categories', async (event, path: string) => {
   } catch (error) {
     event.reply('get-resource-categories-reply', error)
   }
-});
+})
