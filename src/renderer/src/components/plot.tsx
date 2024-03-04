@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 
 /* Visx */
 import { Group } from '@visx/group'
@@ -151,6 +151,20 @@ const Plot = ({
     setTooltip({ top: 0, left: 0, data: null })
   }
 
+  const selectedPointIds = useMemo(() => new Set(selectedPoints.map(point => point.index)), [selectedPoints]);
+  
+  const processedData = useMemo(() => data?.map(point => ({
+    ...point,
+    cx: xScale(point.x),
+    cy: yScale(point.y),
+    fill: selectedPointIds.has(point.index)
+      ? colorScale(point.score)
+      : selectedPoints.length > 0
+        ? 'gray'
+        : colorScale(point.score),
+  })), [data, xScale, yScale, colorScale, selectedPointIds, selectedPoints.length]);
+
+
   return (
     <>
       {togglePlotOptions && <PlotOptions plotState={plotState} setPlotState={setPlotState} />}
@@ -175,19 +189,13 @@ const Plot = ({
                 <GridColumns scale={xScale} height={dimensions.height} stroke="#e0e0e0" />
               </>
             )}
-            {data?.map((point, i) => (
+             {processedData.map((point) => (
               <Circle
-                key={`point-${i}`}
-                cx={xScale(point.x)}
-                cy={yScale(point.y)}
-                r={plotState.pointSize} // radius of point
-                fill={
-                  selectedPoints.includes(point)
-                    ? colorScale(point.score)
-                    : selectedPoints.length > 0
-                    ? 'gray'
-                    : colorScale(point.score)
-                }
+                key={`point-${point.index}`}
+                cx={point.cx}
+                cy={point.cy}
+                r={plotState.pointSize}
+                fill={point.fill}
                 className={styles.point}
                 onMouseEnter={(event) => handleMouseEnter(event, point)}
                 onMouseLeave={handleMouseLeave}

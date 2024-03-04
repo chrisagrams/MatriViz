@@ -156,7 +156,9 @@ const App = (): JSX.Element => {
         // Sort the data by score to show the highest scoring points on top
         processedData.sort((a, b) => a.score - b.score)
 
-        setData(processedData)
+        const temp = processedData.slice(processedData.length - 5000);
+
+        setData(temp)
         setLoading(false)
         setMinorLoading(false)
 
