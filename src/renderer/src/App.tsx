@@ -255,7 +255,10 @@ const App = (): JSX.Element => {
             </button>
           )}
 
-          <h2>Selected Points</h2>
+          <div className={styles.selectedHeader}>
+            <h2>Selected Points</h2>
+            <button onClick={() => window.export.exportCSV(selectedData)}>Export...</button>
+          </div>
           {selectedData.length > 0 && (
             <Row index={<b>Index</b>} score={<b>Score</b>} color={'white'}></Row> // Header
           )}

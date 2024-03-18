@@ -1,10 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog} from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import { loadFeatherFile, queryGlobalTable, tableToJson } from './feather'
 import { queryParquetFile, getAllColumns } from './parquet'
 import { getResourceList, getCategories } from './resources'
+import { writeToCSV } from './export' 
 
 import icon from '../../resources/icon.png?asset'
 
@@ -129,4 +130,28 @@ ipcMain.on('get-resource-categories', async (event, path: string) => {
   } catch (error) {
     event.reply('get-resource-categories-reply', error)
   }
+})
+
+ipcMain.on('export-csv', async (event, result:{}) => {
+  const options = {
+    title: 'Export CSV',
+    defaultPath: 'export.csv',
+    filters: [
+      { name: 'CSV Files', extensions: ['csv'] }
+    ]
+  };
+
+  const filePath = await dialog.showSaveDialog(options);
+
+  if (!filePath.canceled) {
+    console.log(filePath.filePath);
+    if(filePath.filePath)
+      writeToCSV(result, filePath.filePath);
+
+  }
+  else {
+    console.log("Export canceled");
+    event.reply('export-csv-reply', "Export canceled");
+  }
+
 })

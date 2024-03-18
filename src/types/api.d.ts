@@ -16,6 +16,9 @@ declare global {
       getResourceList: (dirPath: string) => Promise<ResourceFile[]>
       getResourceCategories: (path: string) => Promise<any>
     }
+    export: {
+      exportCSV: (result: {}) => Promise<void>;
+    }
   }
 }
 

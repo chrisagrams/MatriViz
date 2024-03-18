@@ -89,6 +89,21 @@ if (process.contextIsolated) {
         })
       }
     })
+    contextBridge.exposeInMainWorld('export', {
+      exportCSV: (result: {}) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send("export-csv", result);
+          ipcRenderer.once("export-csv-reply", (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            }
+            else {
+              resolve(response);
+            }
+          })
+        })
+      }
+    })
   } catch (error) {
     console.error(error)
   }

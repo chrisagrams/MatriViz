@@ -98,6 +98,14 @@
     font-size: 14px;
 }
 
+.selectedHeader {
+    display: flex;
+    justify-content: space-between;
+}
+.selectedHeader > button {
+    margin: auto 0;
+}
+
 .selectedContainer {
     display: flex;
     flex-direction: column;
