@@ -7,12 +7,12 @@ export const writeToCSV = async (result: any[], selectedGenes: string[], parquet
         
         const queryResult = await queryParquetFileByIndex(parquetFile, [...selectedGenes, 'umap_1', 'umap_2', 'index'], indices);
         
-       for (const item of queryResult) {
-        let totalScore = 0;
-        for (const gene of selectedGenes) {
-            totalScore += parseFloat(item[gene]) || 0; // Ensure gene value exists, add 0 if it doesn't
-        }
-        item.total_score = totalScore;
+        for (const item of queryResult) {
+            let totalScore = 0;
+            for (const gene of selectedGenes) {
+                totalScore += parseFloat(item[gene]) || 0; // Ensure gene value exists, add 0 if it doesn't
+            }
+            item.total_score = totalScore;
         }
 
         queryResult.sort((a, b) => b.total_score - a.total_score); 
