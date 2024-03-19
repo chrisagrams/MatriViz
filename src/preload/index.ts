@@ -115,9 +115,9 @@ if (process.contextIsolated) {
       }
     })
     contextBridge.exposeInMainWorld('export', {
-      exportCSV: (result: {}) => {
+      exportCSV: (result: {}, selectedGenes: string[], parquetFile: string) => {
         return new Promise((resolve, reject) => {
-          ipcRenderer.send("export-csv", result);
+          ipcRenderer.send("export-csv", result, selectedGenes, parquetFile);
           ipcRenderer.once("export-csv-reply", (event, response) => {
             if (response instanceof Error) {
               reject(response)

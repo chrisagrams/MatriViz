@@ -292,7 +292,10 @@ const App = (): JSX.Element => {
 
           <div className={styles.selectedHeader}>
             <h2>Selected Points</h2>
-            <button onClick={() => window.export.exportCSV(selectedData)}>Export...</button>
+            <button onClick={() => window.export.exportCSV(selectedData,
+                                                           selectedGenes,
+                                                           resourcesDir + currentResource?.parquet_file)
+                                                           }>Export...</button>
           </div>
           
           {selectedData.length > 0 ? (

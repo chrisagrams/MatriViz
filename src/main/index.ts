@@ -135,7 +135,7 @@ ipcMain.on('get-resource-categories', async (event, path: string) => {
   }
 })
 
-ipcMain.on('export-csv', async (event, result:[]) => {
+ipcMain.on('export-csv', async (event, result:[], selectedGenes: string[], parquetFile: string,) => {
   const options = {
     title: 'Export CSV',
     defaultPath: 'export.csv',
@@ -148,8 +148,8 @@ ipcMain.on('export-csv', async (event, result:[]) => {
 
   if (!filePath.canceled) {
     console.log(filePath.filePath);
-    if(filePath.filePath)
-      writeToCSV(result, filePath.filePath);
+  if(filePath.filePath)
+    writeToCSV(result, selectedGenes, parquetFile, filePath.filePath);
 
   }
   else {
