@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog} from 'electron'
-import { join } from 'path'
+import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import Store from 'electron-store';
 
 import { loadFeatherFile, queryGlobalTable, tableToJson } from './feather'
 import { queryParquetFile, getAllColumns } from './parquet'
@@ -8,6 +9,8 @@ import { getResourceList, getCategories } from './resources'
 import { writeToCSV } from './export' 
 
 import icon from '../../resources/icon.png?asset'
+
+const store = new Store();
 
 function createWindow(): void {
   // Create the browser window.
@@ -18,7 +21,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
@@ -37,7 +40,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
 }
 
@@ -132,7 +135,7 @@ ipcMain.on('get-resource-categories', async (event, path: string) => {
   }
 })
 
-ipcMain.on('export-csv', async (event, result:{}) => {
+ipcMain.on('export-csv', async (event, result:[]) => {
   const options = {
     title: 'Export CSV',
     defaultPath: 'export.csv',
@@ -154,4 +157,25 @@ ipcMain.on('export-csv', async (event, result:{}) => {
     event.reply('export-csv-reply', "Export canceled");
   }
 
+})
+
+ipcMain.on('get-resource-dir', (event) => {
+    const dir = store.get("resourceDir");
+    event.sender.send('get-resource-dir-reply', dir);
+});
+
+ipcMain.on('set-resource-dir', async (event) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+    title: 'Select Resource Directory',
+  });
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    let resourceDir = result.filePaths[0];
+    if (!resourceDir.endsWith(path.sep)) {
+      resourceDir += path.sep;
+    }
+    store.set("resourceDir", resourceDir);
+    event.sender.send('set-resource-dir-reply', resourceDir);
+  }
 })

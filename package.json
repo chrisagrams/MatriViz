@@ -1,5 +1,5 @@
 {
-  "name": "matriseq-electron",
+  "name": "MatriViz",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
@@ -13,7 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "npm run typecheck && electron-vite build",
+    "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config",
     "build:mac": "electron-vite build && electron-builder --mac --config",
@@ -26,6 +26,7 @@
     "@visx/visx": "^3.4.1",
     "apache-arrow": "^14.0.0",
     "d3-polygon": "^3.0.1",
+    "electron-store": "^8.2.0",
     "electron-updater": "^6.1.1",
     "lucide-react": "^0.314.0",
     "parquetjs": "^0.11.2",

@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { resolve } from 'path'
 
 // Custom APIs for renderer
 const api = {}
@@ -80,6 +81,30 @@ if (process.contextIsolated) {
         return new Promise((resolve, reject) => {
           ipcRenderer.send('get-resource-categories', path)
           ipcRenderer.once('get-resource-categories-reply', (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
+      getResourceDir: () => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send("get-resource-dir")
+          ipcRenderer.once("get-resource-dir-reply", (event, response) => {
+            if (response instanceof Error) {
+              reject(response)
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      },
+      setResourceDir: (path: string) => {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.send("set-resource-dir")
+          ipcRenderer.once("set-resource-dir-reply", (event, response) => {
             if (response instanceof Error) {
               reject(response)
             } else {

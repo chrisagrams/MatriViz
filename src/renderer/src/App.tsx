@@ -17,7 +17,7 @@ const App = (): JSX.Element => {
   const defaultMinColor = '#ffff00'
   const defaultMaxColor = '#ff0000'
 
-  const [resourcesDir, setResourcesDir] = useState<string>('./resources/') // TODO: Make this configurable
+  const [resourcesDir, setResourcesDir] = useState<string>('./')
   const [resources, setResources] = useState<ResourceFile[]>([])
   const [currentResource, setCurrentResource] = useState<ResourceFile>()
   const [categories, setCategories] = useState({} as any)
@@ -29,7 +29,7 @@ const App = (): JSX.Element => {
   const [loading, setLoading] = useState(true)
   const [minorLoading, setMinorLoading] = useState(false) // Use only for non-blocking loading
 
-  const [selectedGenes, setSelectedGenes] = useState(['SAMD11', 'HES4', 'CD44'])
+  const [selectedGenes, setSelectedGenes] = useState(["COL1A1"]);
   const [highlightedGene, setHighlightedGene] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showAllGenes, setShowAllGenes] = useState(false)
@@ -51,15 +51,33 @@ const App = (): JSX.Element => {
     toggleGridlines: true
   })
 
+  const handleResourceDirectorySelection = () => {
+    window.resources.setResourceDir().then(result => {
+      setResourcesDir(result);
+    });
+  }
+
   const populateResources = () => {
     window.resources.getResourceList(resourcesDir).then((files) => {
+      if(files.length == 0) // No files found.
+      {
+        setLoading(false);
+        console.error("No files found!");
+        populateResources(); // Note, this is recursive
+      }
       setResources(files as ResourceFile[])
       if (currentResource === undefined && files.length > 0)
         // If no resource is selected, select the first one
         setCurrentResource(files[0])
-      console.log(resources)
     })
   }
+
+  useEffect(() => {
+    window.resources.getResourceDir()
+    .then(dir => {
+      setResourcesDir(dir)
+    })
+  }, []);
 
   useEffect(() => {
     populateResources()
@@ -86,17 +104,25 @@ const App = (): JSX.Element => {
   }, [currentResource])
 
   const handleResourceChange = (event) => {
+    setLoading(true);
     const selectedResource = event.target.value
+    setSelectedData([]);
     setCurrentResource(resources.find((resource) => resource.category_name === selectedResource))
+    setSelectedCategory("default");
+    setSelectedGenes([]);
     console.log('currentResource:' + currentResource)
   }
 
   const handleCategoryChange = (event) => {
-    setMinorLoading(true)
-    const selectedCategory = event.target.value
+    setMinorLoading(true);
+    const selectedCategory = event.target.value;
     setSelectedData([])
-    setSelectedGenes(categories[selectedCategory])
-    setSelectedCategory(selectedCategory)
+    if (selectedCategory === "default" || selectedCategory === undefined)
+      setSelectedGenes([]);
+    else
+      setSelectedGenes(categories[selectedCategory]);
+    setSelectedCategory(selectedCategory);
+    
   }
 
   const handleBadgeClick = (badge) => {
@@ -200,22 +226,31 @@ const App = (): JSX.Element => {
           <h1>MatriViz</h1>
           <h2>Category</h2>
           <div className={styles.categoryContainer}>
-            <select onClick={populateResources} onChange={handleResourceChange}>
-              {resources.map((resource) => (
-                <option key={resource.category_name} value={resource.category_name}>
-                  {resource.category_description}
-                </option>
-              ))}
-            </select>
-            <select onChange={handleCategoryChange} value={selectedCategory}>
-              <option value="">Category</option>
-              {Object.keys(categories).map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
+            {resources.length === 0 ? (
+              <div>
+                <p>No resources found in directory {resourcesDir} <br></br>Please select a resource directory:</p>
+                <button onClick={() => handleResourceDirectorySelection()}>Select Resource Directory</button>
+              </div>
+            ) : (
+              <>
+                <select onClick={populateResources} onChange={handleResourceChange}>
+                  {resources.map((resource) => (
+                    <option key={resource.category_name} value={resource.category_name}>
+                      {resource.category_description}
+                    </option>
+                  ))}
+                </select>
+                <select onChange={handleCategoryChange} value={selectedCategory}>
+                  <option value="default">Category</option>
+                  {Object.keys(categories).map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
+        </div>
 
           <h2>Selected Genes</h2>
           <div className={styles.geneSearch}>
@@ -259,19 +294,24 @@ const App = (): JSX.Element => {
             <h2>Selected Points</h2>
             <button onClick={() => window.export.exportCSV(selectedData)}>Export...</button>
           </div>
-          {selectedData.length > 0 && (
-            <Row index={<b>Index</b>} score={<b>Score</b>} color={'white'}></Row> // Header
+          
+          {selectedData.length > 0 ? (
+            <>
+              <Row index={<b>Index</b>} score={<b>Score</b>} color={'white'}></Row> {/* Header */}
+              <div className={styles.selectedContainer}>
+                {selectedData.map((point, i) => (
+                  <Row
+                    key={`selected-point-${i}`}
+                    index={point.index}
+                    score={point.score.toFixed(3)}
+                    color={point.color}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className={styles.selectedMessage}>Drag mouse over plot to select points.</p>
           )}
-          <div className={styles.selectedContainer}>
-            {selectedData.map((point, i) => (
-              <Row
-                key={`selected-point-${i}`}
-                index={point.index}
-                score={point.score.toFixed(3)}
-                color={point.color}
-              />
-            ))}
-          </div>
         </div>
         <div className={styles.plotArea}>
           {minorLoading && (

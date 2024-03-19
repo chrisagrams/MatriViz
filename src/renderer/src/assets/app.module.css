@@ -84,7 +84,7 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 10px;
-    overflow: scroll;
+    overflow-y: scroll;
     min-height: 100px;
 }
 
@@ -106,10 +106,14 @@
     margin: auto 0;
 }
 
+.selectedMessage {
+    margin: auto;
+}
+
 .selectedContainer {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin-bottom: 10px;
-    overflow: scroll;
+    overflow-y: scroll;
 }
