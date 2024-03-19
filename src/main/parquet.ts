@@ -21,6 +21,27 @@ export const queryParquetFile = (filePath: string, query: string[] = [], limit: 
     }
   })
 }
+
+export const queryParquetFileByIndex = async (filePath: string, query: string[] = [], indices: string[]): Promise<any[]> => {
+  try {
+      const reader = await parquet.ParquetReader.openFile(filePath);
+      const cursor = reader.getCursor(query);
+
+      const json = [];
+      let record = null;
+
+      while ((record = await cursor.next())) {
+          if (indices.includes(record.index.toString())) {
+              json.push(record);
+          }
+      }
+
+      return json;
+  } catch (error) {
+      throw new Error(`Error querying Parquet file: ${error}`);
+  }
+}
+
 export const getAllColumns = (filePath: string): Promise<string[]> => {
   return new Promise(async (resolve, reject) => {
     try {

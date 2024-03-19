@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: matriseq-electron
+productName: MatriViz
 directories:
   buildResources: build
 files:
@@ -12,7 +12,10 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: matriseq-electron
+  executableName: MatriViz
+  target: 
+    - portable
+  artifactName: MatriViz_portable.exe
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

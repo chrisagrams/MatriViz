@@ -46,12 +46,14 @@ const Plot = ({
 
   const [togglePlotOptions, setTogglePlotOptions] = useState(false)
 
+  const scaleOffset = 2;
+
   const xScale = scaleLinear({
     range: [
       (0 - plotState.transformX) / zoomLevel,
       (dimensions.width - plotState.transformX) / zoomLevel
     ],
-    domain: [Math.min(...data.map((d) => d.x)), Math.max(...data.map((d) => d.x))]
+    domain: [Math.min(...data.map((d) => d.x)) - scaleOffset, Math.max(...data.map((d) => d.x))+ scaleOffset]
   })
 
   const yScale = scaleLinear({
@@ -59,7 +61,7 @@ const Plot = ({
       (dimensions.height - plotState.transformY) / zoomLevel,
       (0 - plotState.transformY) / zoomLevel
     ],
-    domain: [Math.min(...data.map((d) => d.y)), Math.max(...data.map((d) => d.y))]
+    domain: [Math.min(...data.map((d) => d.y)) - scaleOffset, Math.max(...data.map((d) => d.y)) + scaleOffset]
   })
 
   const colorScale = scaleLinear<string>({
