@@ -1,34 +1,12 @@
-# matriseq-electron
+# MatriViz
 
-An Electron application with React and TypeScript
+## Instructions
+Download the latest version of MatriViz under "Releases" for your platform.
 
-## Recommended IDE Setup
+The dataset must be downloaded and unzipped separately:
+https://uofi.box.com/s/mge2war2cnyzougteup2mga2uem7ylaj
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-## Project Setup
+Once downloaded, open the application and click "Select Resource Directory". Point the directory to the unzipped dataset folder.
 
-### Install
 
-```bash
-$ npm install
-```
-
-### Development
-
-```bash
-$ npm run dev
-```
-
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
-```
