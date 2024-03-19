@@ -1,10 +1,10 @@
 {
   "name": "MatriViz",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://www.electronjs.org",
+  "author": "lab.gy",
+  "homepage": "https://www.lab.gy",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",

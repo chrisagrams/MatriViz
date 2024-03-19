@@ -13,6 +13,9 @@ asarUnpack:
   - resources/**
 win:
   executableName: MatriViz
+  target: 
+    - portable
+  artifactName: MatriViz_portable.exe
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
