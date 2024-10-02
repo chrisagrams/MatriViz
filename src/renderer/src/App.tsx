@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useToast } from '@renderer/components/ui/use-toast'
 
 /* Components */
 import Plot from './components/plot'
@@ -12,6 +13,16 @@ import styles from './assets/app.module.css'
 /* Types */
 import { DataPoint, LabelPoint, PlotState } from './types'
 import { ResourceFile } from '../../types/types'
+
+/* shadcn/ui */
+import { Button } from '@renderer/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@renderer/components/ui/select"
 
 const App = (): JSX.Element => {
   const defaultMinColor = '#ffff00'
@@ -103,25 +114,23 @@ const App = (): JSX.Element => {
       })
   }, [currentResource])
 
-  const handleResourceChange = (event) => {
+  const handleResourceChange = (value) => {
     setLoading(true);
-    const selectedResource = event.target.value
     setSelectedData([]);
-    setCurrentResource(resources.find((resource) => resource.category_name === selectedResource))
+    setCurrentResource(resources.find((resource) => resource.category_name === value))
     setSelectedCategory("default");
     setSelectedGenes([]);
     console.log('currentResource:' + currentResource)
   }
 
-  const handleCategoryChange = (event) => {
+  const handleCategoryChange = (value) => {
     setMinorLoading(true);
-    const selectedCategory = event.target.value;
     setSelectedData([])
-    if (selectedCategory === "default" || selectedCategory === undefined)
+    if (value === "default" || value === undefined)
       setSelectedGenes([]);
     else
-      setSelectedGenes(categories[selectedCategory]);
-    setSelectedCategory(selectedCategory);
+      setSelectedGenes(categories[value]);
+    setSelectedCategory(value);
     
   }
 
@@ -223,8 +232,8 @@ const App = (): JSX.Element => {
     <>
       <div className={styles.container}>
         <div className={styles.panel}>
-          <h1>MatriViz</h1>
-          <h2>Category</h2>
+          <h1 className="font-bold text-4xl">MatriViz</h1>
+          <h2 className='font-bold text-2xl'>Category</h2>
           <div className={styles.categoryContainer}>
             {resources.length === 0 ? (
               <div>
@@ -233,21 +242,34 @@ const App = (): JSX.Element => {
               </div>
             ) : (
               <>
-                <select onClick={populateResources} onChange={handleResourceChange}>
-                  {resources.map((resource) => (
-                    <option key={resource.category_name} value={resource.category_name}>
-                      {resource.category_description}
-                    </option>
-                  ))}
-                </select>
-                <select onChange={handleCategoryChange} value={selectedCategory}>
-                  <option value="default">Category</option>
-                  {Object.keys(categories).map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+                <Select 
+                  onValueChange={handleResourceChange}>
+                  <SelectTrigger  className="w-full">
+                    <SelectValue placeholder={resources[0].category_description} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resources.map((resource) => (
+                      <SelectItem key={resource.category_name} value={resource.category_name}>
+                        {resource.category_description}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select 
+                  onValueChange={handleCategoryChange}>
+                  <SelectTrigger  className="w-full">
+                    <SelectValue placeholder='Category' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(categories).map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
               </>
             )}
         </div>
