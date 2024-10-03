@@ -3,9 +3,10 @@ import { useToast } from '@renderer/components/ui/use-toast'
 
 /* Components */
 import Plot from './components/plot'
-import Badge from './components/badge'
+import GeneBadge from './components/badge'
 import Row from './components/row'
 import Loading from './components/loading'
+import { ExportTasks } from './components/ExportTasks'
 
 /* Styles */
 import styles from './assets/app.module.css'
@@ -15,7 +16,6 @@ import { DataPoint, LabelPoint, PlotState } from './types'
 import { ResourceFile } from '../../types/types'
 
 /* shadcn/ui */
-import { Button } from '@renderer/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -295,29 +295,29 @@ const App = (): JSX.Element => {
             </div>
           </div>
           <div className={styles.badgeContainer}>
-            {/* If showAllGenes is selected, map all. Otherwise, only map 10 */}
-            {selectedGenes.slice(0, showAllGenes ? selectedGenes.length : 10).map((gene) => (
-              <Badge
+            {selectedGenes.map((gene) => (
+              <GeneBadge
+                key={gene}
                 gene={gene}
                 handleBadgeClick={handleBadgeClick}
                 removeGene={removeGene}
                 isHighlighted={highlightedGene === gene}
               />
             ))}
-            {!showAllGenes && <span className={styles.ellipsis}>...</span>}
           </div>
-          {selectedGenes.length > 10 && (
-            <button onClick={() => setShowAllGenes(!showAllGenes)}>
-              {showAllGenes ? 'Hide' : 'See All'}
-            </button>
-          )}
-
+        
           <div className={styles.selectedHeader}>
             <h2>Selected Points</h2>
-            <button onClick={() => window.export.exportCSV(selectedData,
+            {/* <button onClick={() => window.export.exportCSV(selectedData,
                                                            selectedGenes,
                                                            resourcesDir + currentResource?.parquet_file)
-                                                           }>Export...</button>
+                                                           }>Export...</button> */}
+            <ExportTasks
+              selectedData={selectedData}
+              selectedGenes={selectedGenes}
+              resourcesDir={resourcesDir}
+              currentResource={currentResource}
+            ></ExportTasks>
           </div>
           
           {selectedData.length > 0 ? (

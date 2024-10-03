@@ -83,8 +83,10 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 10px;
-    overflow-y: scroll;
-    min-height: 100px;
+    overflow-y: auto;
+    gap: 0.5rem;
+    max-height: 200px;
+    min-height: 4rem;
 }
 
 .selectedBadge {

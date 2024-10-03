@@ -15,6 +15,8 @@ import { Settings } from 'lucide-react'
 import useLasso from './lasso'
 import Legend from './legend'
 import PlotOptions from './plotOptions'
+import { PlotOptionsSheet } from '@renderer/components/PlotOptionsSheet'
+
 
 /* Types */
 import { DataPoint, LabelPoint, TooltipData, PlotState } from '../types'
@@ -36,8 +38,8 @@ const Plot = ({
   onSelectedData: (data: DataPoint[]) => void
 }): JSX.Element => {
   const [dimensions, setDimensions] = useState({
-    width: window.innerHeight - 50,
-    height: window.innerHeight - 50
+    width: window.innerHeight,
+    height: window.innerHeight
   })
   const svgContainerRef = useRef<SVGSVGElement | null>(null)
   const [zoomLevel, setZoomLevel] = useState(1)
@@ -102,7 +104,7 @@ const Plot = ({
 
     window.addEventListener('wheel', handleWheel)
     const handleResize = (): void => {
-      setDimensions({ width: window.innerHeight - 50, height: window.innerHeight - 50 })
+      setDimensions({ width: window.innerHeight, height: window.innerHeight })
     }
     window.addEventListener('resize', handleResize)
     return () => {
@@ -169,12 +171,13 @@ const Plot = ({
 
   return (
     <>
-      {togglePlotOptions && <PlotOptions plotState={plotState} setPlotState={setPlotState} />}
-      <div className="container">
-        <div className={styles.settings} onClick={() => setTogglePlotOptions(!togglePlotOptions)}>
+      {/* {togglePlotOptions && <PlotOptions plotState={plotState} setPlotState={setPlotState} />} */}
+      <div className="flex flex-row w-full h-full relative">
+      <PlotOptionsSheet plotState={plotState} setPlotState={setPlotState}></PlotOptionsSheet>
+        {/* <div className={styles.settings} onClick={() => setTogglePlotOptions(!togglePlotOptions)}>
           <p>Plot options </p>
           <Settings />
-        </div>
+        </div> */}
         <svg
           ref={svgContainerRef}
           width={dimensions.width}

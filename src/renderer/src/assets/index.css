@@ -11,6 +11,8 @@ body {
   justify-content: center;
   overflow: hidden;
   user-select: none;
+  height: 100%;
+  width: 100%;
 }
 
 #root {
