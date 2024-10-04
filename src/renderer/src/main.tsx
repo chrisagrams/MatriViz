@@ -6,6 +6,7 @@ import { Toaster } from '@renderer/components/ui/toaster'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
+    <div id="drag-region" className="absolute top-0 left-0 w-full h-8 -webkit-app-region-drag"></div>
     <App />
     <Toaster />
   </React.StrictMode>
