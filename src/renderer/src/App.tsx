@@ -232,8 +232,8 @@ const App = (): JSX.Element => {
     <>
       <div className={styles.container}>
         <div className={styles.panel}>
-          <h1 className="font-bold text-4xl">MatriViz</h1>
-          <h2 className='font-bold text-2xl'>Category</h2>
+          <h1 className="text-3xl font-bold tracking-tight">MatriViz</h1>
+          <h2 className='text-2xl font-semibold tracking-tight'>Category</h2>
           <div className={styles.categoryContainer}>
             {resources.length === 0 ? (
               <div>
@@ -274,7 +274,7 @@ const App = (): JSX.Element => {
             )}
         </div>
 
-          <h2>Selected Genes</h2>
+          <h2 className='text-2xl font-semibold tracking-tight'>Selected Genes</h2>
           <div className={styles.geneSearch}>
             <input
               type="text"
