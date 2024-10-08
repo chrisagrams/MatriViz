@@ -33,13 +33,14 @@ const Plot = ({
   onSelectedData: (data: DataPoint[]) => void
 }): JSX.Element => {
   const [dimensions, setDimensions] = useState({
-    width: window.innerHeight,
-    height: window.innerHeight
+    width: 0,
+    height: 0
   })
   const svgContainerRef = useRef<SVGSVGElement | null>(null)
   const [zoomLevel, setZoomLevel] = useState(1)
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([])
   const [tooltip, setTooltip] = useState<TooltipData>()
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   const scaleOffset = 2
 
@@ -102,14 +103,32 @@ const Plot = ({
     }
 
     window.addEventListener('wheel', handleWheel)
+  }, [zoomLevel, plotState])
+
+  useEffect(() => {
     const handleResize = (): void => {
-      setDimensions({ width: window.innerHeight, height: window.innerHeight })
+      if (containerRef.current) {
+        setDimensions({ 
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight
+        })
+      }
     }
+    handleResize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    })
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current)
+    }
+
     window.addEventListener('resize', handleResize)
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [zoomLevel, plotState])
+  }, []);
 
   useEffect(() => {
     // Set the min and max score
@@ -176,7 +195,7 @@ const Plot = ({
 
   return (
     <>
-      <div className="flex flex-row w-full h-full relative">
+      <div ref={containerRef} className="flex flex-row w-full h-screen relative">
         <PlotOptionsSheet plotState={plotState} setPlotState={setPlotState}></PlotOptionsSheet>
         <svg
           ref={svgContainerRef}

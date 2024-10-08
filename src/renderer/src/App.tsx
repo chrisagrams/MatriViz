@@ -6,6 +6,8 @@ import GeneBadge from './components/badge'
 import Row from './components/row'
 import Loading from './components/loading'
 import { ExportTasks } from './components/ExportTasks'
+import { DataTable } from './components/table'
+import { columns } from './components/columns'
 
 /* Styles */
 import styles from './assets/app.module.css'
@@ -320,7 +322,7 @@ const App = (): JSX.Element => {
               <ResizableHandle></ResizableHandle>
               <ResizablePanel>
                 <div className={styles.selectedHeader}>
-                  <h2>Selected Points</h2>
+                  <h2 className='text-2xl font-semibold tracking-tight my-auto'>Selected Points</h2>
                   {/* <button onClick={() => window.export.exportCSV(selectedData,
                                                            selectedGenes,
                                                            resourcesDir + currentResource?.parquet_file)
@@ -334,22 +336,11 @@ const App = (): JSX.Element => {
                 </div>
 
                 {selectedData.length > 0 ? (
-                  <>
-                    <Row index={<b>Index</b>} score={<b>Score</b>} color={'white'}></Row>{' '}
-                    {/* Header */}
-                    <div className={styles.selectedContainer}>
-                      {selectedData.map((point, i) => (
-                        <Row
-                          key={`selected-point-${i}`}
-                          index={point.index}
-                          score={point.score.toFixed(3)}
-                          color={point.color}
-                        />
-                      ))}
-                    </div>
-                  </>
+                  <div className='overflow-y-auto max-h-96'>
+                    <DataTable columns={columns} data={selectedData}></DataTable>
+                  </div>
                 ) : (
-                  <p className={styles.selectedMessage}>Drag mouse over plot to select points.</p>
+                  <p className='text-sm text-muted-foreground text-center'>Drag mouse over plot to select points.</p>
                 )}
               </ResizablePanel>
             </ResizablePanelGroup>

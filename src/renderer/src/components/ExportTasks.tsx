@@ -16,7 +16,7 @@ export const ExportTasks = ({ selectedData, selectedGenes, resourcesDir, current
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className='m-2'>
           Export <Download className="w-4 h-4 ml-2" />
         </Button>
       </DropdownMenuTrigger>

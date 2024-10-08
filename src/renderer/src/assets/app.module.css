@@ -103,9 +103,6 @@
   display: flex;
   justify-content: space-between;
 }
-.selectedHeader > button {
-  margin: auto 0;
-}
 
 .selectedMessage {
   margin: auto;
