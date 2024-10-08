@@ -19,7 +19,7 @@ declare global {
       getResourceDir: () => Promise<string>
     }
     export: {
-      exportCSV: (result: {}, selectedGenes: string[], parquetFile: string) => Promise<void>;
+      exportCSV: (result: {}, selectedGenes: string[], parquetFile: string) => Promise<void>
     }
   }
 }

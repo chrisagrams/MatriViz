@@ -1,22 +1,22 @@
-import { app, shell, BrowserWindow, ipcMain, dialog} from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import Store from 'electron-store';
+import Store from 'electron-store'
 
 import { loadFeatherFile, queryGlobalTable, tableToJson } from './feather'
 import { queryParquetFile, getAllColumns } from './parquet'
 import { getResourceList, getCategories } from './resources'
-import { writeToCSV } from './export' 
+import { writeToCSV } from './export'
 
 import icon from '../../resources/icon.png?asset'
 
-const store = new Store();
+const store = new Store()
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1260,
+    height: 820,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
@@ -136,47 +136,44 @@ ipcMain.on('get-resource-categories', async (event, path: string) => {
   }
 })
 
-ipcMain.on('export-csv', async (event, result:[], selectedGenes: string[], parquetFile: string,) => {
-  const options = {
-    title: 'Export CSV',
-    defaultPath: 'export.csv',
-    filters: [
-      { name: 'CSV Files', extensions: ['csv'] }
-    ]
-  };
+ipcMain.on(
+  'export-csv',
+  async (event, result: [], selectedGenes: string[], parquetFile: string) => {
+    const options = {
+      title: 'Export CSV',
+      defaultPath: 'export.csv',
+      filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    }
 
-  const filePath = await dialog.showSaveDialog(options);
+    const filePath = await dialog.showSaveDialog(options)
 
-  if (!filePath.canceled) {
-    console.log(filePath.filePath);
-  if(filePath.filePath)
-    writeToCSV(result, selectedGenes, parquetFile, filePath.filePath);
-
+    if (!filePath.canceled) {
+      console.log(filePath.filePath)
+      if (filePath.filePath) writeToCSV(result, selectedGenes, parquetFile, filePath.filePath)
+    } else {
+      console.log('Export canceled')
+      event.reply('export-csv-reply', 'Export canceled')
+    }
   }
-  else {
-    console.log("Export canceled");
-    event.reply('export-csv-reply', "Export canceled");
-  }
-
-})
+)
 
 ipcMain.on('get-resource-dir', (event) => {
-    const dir = store.get("resourceDir");
-    event.sender.send('get-resource-dir-reply', dir);
-});
+  const dir = store.get('resourceDir')
+  event.sender.send('get-resource-dir-reply', dir)
+})
 
 ipcMain.on('set-resource-dir', async (event) => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
-    title: 'Select Resource Directory',
-  });
+    title: 'Select Resource Directory'
+  })
 
   if (!result.canceled && result.filePaths.length > 0) {
-    let resourceDir = result.filePaths[0];
+    let resourceDir = result.filePaths[0]
     if (!resourceDir.endsWith(path.sep)) {
-      resourceDir += path.sep;
+      resourceDir += path.sep
     }
-    store.set("resourceDir", resourceDir);
-    event.sender.send('set-resource-dir-reply', resourceDir);
+    store.set('resourceDir', resourceDir)
+    event.sender.send('set-resource-dir-reply', resourceDir)
   }
 })

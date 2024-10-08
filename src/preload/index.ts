@@ -91,8 +91,8 @@ if (process.contextIsolated) {
       },
       getResourceDir: () => {
         return new Promise((resolve, reject) => {
-          ipcRenderer.send("get-resource-dir")
-          ipcRenderer.once("get-resource-dir-reply", (event, response) => {
+          ipcRenderer.send('get-resource-dir')
+          ipcRenderer.once('get-resource-dir-reply', (event, response) => {
             if (response instanceof Error) {
               reject(response)
             } else {
@@ -103,8 +103,8 @@ if (process.contextIsolated) {
       },
       setResourceDir: (path: string) => {
         return new Promise((resolve, reject) => {
-          ipcRenderer.send("set-resource-dir")
-          ipcRenderer.once("set-resource-dir-reply", (event, response) => {
+          ipcRenderer.send('set-resource-dir')
+          ipcRenderer.once('set-resource-dir-reply', (event, response) => {
             if (response instanceof Error) {
               reject(response)
             } else {
@@ -117,13 +117,12 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('export', {
       exportCSV: (result: {}, selectedGenes: string[], parquetFile: string) => {
         return new Promise((resolve, reject) => {
-          ipcRenderer.send("export-csv", result, selectedGenes, parquetFile);
-          ipcRenderer.once("export-csv-reply", (event, response) => {
+          ipcRenderer.send('export-csv', result, selectedGenes, parquetFile)
+          ipcRenderer.once('export-csv-reply', (event, response) => {
             if (response instanceof Error) {
               reject(response)
-            }
-            else {
-              resolve(response);
+            } else {
+              resolve(response)
             }
           })
         })

@@ -42,6 +42,7 @@
     "parquetjs": "^0.11.2",
     "parquetjs-lite": "^0.8.7",
     "react-loader-spinner": "^6.1.6",
+    "react-resizable-panels": "^2.1.4",
     "tailwind-merge": "^2.5.0",
     "tailwindcss-animate": "^1.0.7"
   },

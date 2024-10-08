@@ -1,6 +1,10 @@
 import parquet from 'parquetjs-lite'
 
-export const queryParquetFile = (filePath: string, query: string[] = [], limit: number = 20000): Promise<any[]> => {
+export const queryParquetFile = (
+  filePath: string,
+  query: string[] = [],
+  limit: number = 20000
+): Promise<any[]> => {
   return new Promise(async (resolve, reject) => {
     try {
       const reader = await parquet.ParquetReader.openFile(filePath)
@@ -12,7 +16,7 @@ export const queryParquetFile = (filePath: string, query: string[] = [], limit: 
       while ((record = await cursor.next())) {
         json.push(record)
         count++
-        if (count >= limit) break; // Break the loop once the limit is reached
+        if (count >= limit) break // Break the loop once the limit is reached
       }
 
       resolve(json)
@@ -22,23 +26,27 @@ export const queryParquetFile = (filePath: string, query: string[] = [], limit: 
   })
 }
 
-export const queryParquetFileByIndex = async (filePath: string, query: string[] = [], indices: string[]): Promise<any[]> => {
+export const queryParquetFileByIndex = async (
+  filePath: string,
+  query: string[] = [],
+  indices: string[]
+): Promise<any[]> => {
   try {
-      const reader = await parquet.ParquetReader.openFile(filePath);
-      const cursor = reader.getCursor(query);
+    const reader = await parquet.ParquetReader.openFile(filePath)
+    const cursor = reader.getCursor(query)
 
-      const json = [];
-      let record = null;
+    const json = []
+    let record = null
 
-      while ((record = await cursor.next())) {
-          if (indices.includes(record.index.toString())) {
-              json.push(record);
-          }
+    while ((record = await cursor.next())) {
+      if (indices.includes(record.index.toString())) {
+        json.push(record)
       }
+    }
 
-      return json;
+    return json
   } catch (error) {
-      throw new Error(`Error querying Parquet file: ${error}`);
+    throw new Error(`Error querying Parquet file: ${error}`)
   }
 }
 

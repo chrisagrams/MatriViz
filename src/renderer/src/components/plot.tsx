@@ -8,15 +8,10 @@ import { LinearGradient } from '@visx/gradient'
 import { TooltipWithBounds, defaultStyles as tooltipStyles } from '@visx/tooltip'
 import { GridRows, GridColumns } from '@visx/grid'
 
-/* Lucide */
-import { Settings } from 'lucide-react'
-
 /* Components */
 import useLasso from './lasso'
 import Legend from './legend'
-import PlotOptions from './plotOptions'
 import { PlotOptionsSheet } from '@renderer/components/PlotOptionsSheet'
-
 
 /* Types */
 import { DataPoint, LabelPoint, TooltipData, PlotState } from '../types'
@@ -46,16 +41,17 @@ const Plot = ({
   const [selectedPoints, setSelectedPoints] = useState<DataPoint[]>([])
   const [tooltip, setTooltip] = useState<TooltipData>()
 
-  const [togglePlotOptions, setTogglePlotOptions] = useState(false)
-
-  const scaleOffset = 2;
+  const scaleOffset = 2
 
   const xScale = scaleLinear({
     range: [
       (0 - plotState.transformX) / zoomLevel,
       (dimensions.width - plotState.transformX) / zoomLevel
     ],
-    domain: [Math.min(...data.map((d) => d.x)) - scaleOffset, Math.max(...data.map((d) => d.x))+ scaleOffset]
+    domain: [
+      Math.min(...data.map((d) => d.x)) - scaleOffset,
+      Math.max(...data.map((d) => d.x)) + scaleOffset
+    ]
   })
 
   const yScale = scaleLinear({
@@ -63,7 +59,10 @@ const Plot = ({
       (dimensions.height - plotState.transformY) / zoomLevel,
       (0 - plotState.transformY) / zoomLevel
     ],
-    domain: [Math.min(...data.map((d) => d.y)) - scaleOffset, Math.max(...data.map((d) => d.y)) + scaleOffset]
+    domain: [
+      Math.min(...data.map((d) => d.y)) - scaleOffset,
+      Math.max(...data.map((d) => d.y)) + scaleOffset
+    ]
   })
 
   const colorScale = scaleLinear<string>({
@@ -155,29 +154,30 @@ const Plot = ({
     setTooltip({ top: 0, left: 0, data: null })
   }
 
-  const selectedPointIds = useMemo(() => new Set(selectedPoints.map(point => point.index)), [selectedPoints]);
-  
-  const processedData = useMemo(() => data?.map(point => ({
-    ...point,
-    cx: xScale(point.x),
-    cy: yScale(point.y),
-    fill: selectedPointIds.has(point.index)
-      ? colorScale(point.score)
-      : selectedPoints.length > 0
-        ? 'gray'
-        : colorScale(point.score),
-  })), [data, xScale, yScale, colorScale, selectedPointIds, selectedPoints.length]);
+  const selectedPointIds = useMemo(
+    () => new Set(selectedPoints.map((point) => point.index)),
+    [selectedPoints]
+  )
 
+  const processedData = useMemo(
+    () =>
+      data?.map((point) => ({
+        ...point,
+        cx: xScale(point.x),
+        cy: yScale(point.y),
+        fill: selectedPointIds.has(point.index)
+          ? colorScale(point.score)
+          : selectedPoints.length > 0
+          ? 'gray'
+          : colorScale(point.score)
+      })),
+    [data, xScale, yScale, colorScale, selectedPointIds, selectedPoints.length]
+  )
 
   return (
     <>
-      {/* {togglePlotOptions && <PlotOptions plotState={plotState} setPlotState={setPlotState} />} */}
       <div className="flex flex-row w-full h-full relative">
-      <PlotOptionsSheet plotState={plotState} setPlotState={setPlotState}></PlotOptionsSheet>
-        {/* <div className={styles.settings} onClick={() => setTogglePlotOptions(!togglePlotOptions)}>
-          <p>Plot options </p>
-          <Settings />
-        </div> */}
+        <PlotOptionsSheet plotState={plotState} setPlotState={setPlotState}></PlotOptionsSheet>
         <svg
           ref={svgContainerRef}
           width={dimensions.width}
@@ -194,7 +194,7 @@ const Plot = ({
                 <GridColumns scale={xScale} height={dimensions.height} stroke="#e0e0e0" />
               </>
             )}
-             {processedData.map((point) => (
+            {processedData.map((point) => (
               <Circle
                 key={`point-${point.index}`}
                 cx={point.cx}

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useToast } from '@renderer/components/ui/use-toast'
 
 /* Components */
 import Plot from './components/plot'
@@ -21,8 +20,14 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@renderer/components/ui/select"
+  SelectValue
+} from '@renderer/components/ui/select'
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup
+} from '@renderer/components/ui/resizable'
 
 const App = (): JSX.Element => {
   const defaultMinColor = '#ffff00'
@@ -40,7 +45,7 @@ const App = (): JSX.Element => {
   const [loading, setLoading] = useState(true)
   const [minorLoading, setMinorLoading] = useState(false) // Use only for non-blocking loading
 
-  const [selectedGenes, setSelectedGenes] = useState(["COL1A1"]);
+  const [selectedGenes, setSelectedGenes] = useState(['COL1A1'])
   const [highlightedGene, setHighlightedGene] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showAllGenes, setShowAllGenes] = useState(false)
@@ -63,18 +68,18 @@ const App = (): JSX.Element => {
   })
 
   const handleResourceDirectorySelection = () => {
-    window.resources.setResourceDir().then(result => {
-      setResourcesDir(result);
-    });
+    window.resources.setResourceDir().then((result) => {
+      setResourcesDir(result)
+    })
   }
 
   const populateResources = () => {
     window.resources.getResourceList(resourcesDir).then((files) => {
-      if(files.length == 0) // No files found.
-      {
-        setLoading(false);
-        console.error("No files found!");
-        populateResources(); // Note, this is recursive
+      if (files.length == 0) {
+        // No files found.
+        setLoading(false)
+        console.error('No files found!')
+        populateResources() // Note, this is recursive
       }
       setResources(files as ResourceFile[])
       if (currentResource === undefined && files.length > 0)
@@ -84,11 +89,10 @@ const App = (): JSX.Element => {
   }
 
   useEffect(() => {
-    window.resources.getResourceDir()
-    .then(dir => {
+    window.resources.getResourceDir().then((dir) => {
       setResourcesDir(dir)
     })
-  }, []);
+  }, [])
 
   useEffect(() => {
     populateResources()
@@ -115,23 +119,20 @@ const App = (): JSX.Element => {
   }, [currentResource])
 
   const handleResourceChange = (value) => {
-    setLoading(true);
-    setSelectedData([]);
+    setLoading(true)
+    setSelectedData([])
     setCurrentResource(resources.find((resource) => resource.category_name === value))
-    setSelectedCategory("default");
-    setSelectedGenes([]);
+    setSelectedCategory('default')
+    setSelectedGenes([])
     console.log('currentResource:' + currentResource)
   }
 
   const handleCategoryChange = (value) => {
-    setMinorLoading(true);
+    setMinorLoading(true)
     setSelectedData([])
-    if (value === "default" || value === undefined)
-      setSelectedGenes([]);
-    else
-      setSelectedGenes(categories[value]);
-    setSelectedCategory(value);
-    
+    if (value === 'default' || value === undefined) setSelectedGenes([])
+    else setSelectedGenes(categories[value])
+    setSelectedCategory(value)
   }
 
   const handleBadgeClick = (badge) => {
@@ -139,10 +140,15 @@ const App = (): JSX.Element => {
 
     if (highlightedGene == '') {
       setHighlightedGene(badge)
-      setPlotState({ ...plotState, minColor: 'grey', maxColor: 'yellow', autoMinScore: true})
+      setPlotState({ ...plotState, minColor: 'grey', maxColor: 'yellow', autoMinScore: true })
     } else {
       setHighlightedGene('')
-      setPlotState({ ...plotState, minColor: defaultMinColor, maxColor: defaultMaxColor, autoMinScore: false })
+      setPlotState({
+        ...plotState,
+        minColor: defaultMinColor,
+        maxColor: defaultMaxColor,
+        autoMinScore: false
+      })
     }
   }
 
@@ -191,7 +197,7 @@ const App = (): JSX.Element => {
         // Sort the data by score to show the highest scoring points on top
         processedData.sort((a, b) => a.score - b.score)
 
-        const temp = processedData.slice(processedData.length - 5000);
+        const temp = processedData.slice(processedData.length - 5000)
 
         setData(temp)
         setLoading(false)
@@ -231,129 +237,143 @@ const App = (): JSX.Element => {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.panel}>
-          <h1 className="text-3xl font-bold tracking-tight">MatriViz</h1>
-          <h2 className='text-2xl font-semibold tracking-tight'>Category</h2>
-          <div className={styles.categoryContainer}>
-            {resources.length === 0 ? (
-              <div>
-                <p>No resources found in directory {resourcesDir} <br></br>Please select a resource directory:</p>
-                <button onClick={() => handleResourceDirectorySelection()}>Select Resource Directory</button>
-              </div>
-            ) : (
-              <>
-                <Select 
-                  onValueChange={handleResourceChange}>
-                  <SelectTrigger  className="w-full">
-                    <SelectValue placeholder={resources[0].category_description} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {resources.map((resource) => (
-                      <SelectItem key={resource.category_name} value={resource.category_name}>
-                        {resource.category_description}
-                      </SelectItem>
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={33}>
+            <ResizablePanelGroup direction="vertical" className={styles.panel}>
+              <h1 className="text-3xl font-bold tracking-tight">MatriViz</h1>
+              <ResizablePanel className={styles.categoryContainer}>
+                <h2 className="text-2xl font-semibold tracking-tight">Category</h2>
+                {resources.length === 0 ? (
+                  <div>
+                    <p>
+                      No resources found in directory {resourcesDir} <br></br>Please select a
+                      resource directory:
+                    </p>
+                    <button onClick={() => handleResourceDirectorySelection()}>
+                      Select Resource Directory
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Select onValueChange={handleResourceChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={resources[0].category_description} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {resources.map((resource) => (
+                          <SelectItem key={resource.category_name} value={resource.category_name}>
+                            {resource.category_description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select onValueChange={handleCategoryChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.keys(categories).map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
+                )}
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel>
+                <h2 className="text-2xl font-semibold tracking-tight">Selected Genes</h2>
+                <div className={styles.geneSearch}>
+                  <input
+                    type="text"
+                    placeholder="Search for a gene..."
+                    value={searchInput}
+                    onChange={handleSearchInputChange}
+                  />
+                  <div className={styles.searchResults}>
+                    {searchResults.map((gene) => (
+                      <div
+                        key={gene}
+                        className={styles.searchResultItem}
+                        onClick={() => addSelectedGene(gene)}
+                      >
+                        {gene}
+                      </div>
                     ))}
-                  </SelectContent>
-                </Select>
-
-                <Select 
-                  onValueChange={handleCategoryChange}>
-                  <SelectTrigger  className="w-full">
-                    <SelectValue placeholder='Category' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(categories).map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-              </>
-            )}
-        </div>
-
-          <h2 className='text-2xl font-semibold tracking-tight'>Selected Genes</h2>
-          <div className={styles.geneSearch}>
-            <input
-              type="text"
-              placeholder="Search for a gene..."
-              value={searchInput}
-              onChange={handleSearchInputChange}
-            />
-            <div className={styles.searchResults}>
-              {searchResults.map((gene) => (
-                <div
-                  key={gene}
-                  className={styles.searchResultItem}
-                  onClick={() => addSelectedGene(gene)}
-                >
-                  {gene}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className={styles.badgeContainer}>
-            {selectedGenes.map((gene) => (
-              <GeneBadge
-                key={gene}
-                gene={gene}
-                handleBadgeClick={handleBadgeClick}
-                removeGene={removeGene}
-                isHighlighted={highlightedGene === gene}
-              />
-            ))}
-          </div>
-        
-          <div className={styles.selectedHeader}>
-            <h2>Selected Points</h2>
-            {/* <button onClick={() => window.export.exportCSV(selectedData,
+                <div className={styles.badgeContainer}>
+                  {selectedGenes.map((gene) => (
+                    <GeneBadge
+                      key={gene}
+                      gene={gene}
+                      handleBadgeClick={handleBadgeClick}
+                      removeGene={removeGene}
+                      isHighlighted={highlightedGene === gene}
+                    />
+                  ))}
+                </div>
+              </ResizablePanel>
+              <ResizableHandle></ResizableHandle>
+              <ResizablePanel>
+                <div className={styles.selectedHeader}>
+                  <h2>Selected Points</h2>
+                  {/* <button onClick={() => window.export.exportCSV(selectedData,
                                                            selectedGenes,
                                                            resourcesDir + currentResource?.parquet_file)
                                                            }>Export...</button> */}
-            <ExportTasks
-              selectedData={selectedData}
-              selectedGenes={selectedGenes}
-              resourcesDir={resourcesDir}
-              currentResource={currentResource}
-            ></ExportTasks>
-          </div>
-          
-          {selectedData.length > 0 ? (
-            <>
-              <Row index={<b>Index</b>} score={<b>Score</b>} color={'white'}></Row> {/* Header */}
-              <div className={styles.selectedContainer}>
-                {selectedData.map((point, i) => (
-                  <Row
-                    key={`selected-point-${i}`}
-                    index={point.index}
-                    score={point.score.toFixed(3)}
-                    color={point.color}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className={styles.selectedMessage}>Drag mouse over plot to select points.</p>
-          )}
-        </div>
-        <div className={styles.plotArea}>
-          {minorLoading && (
-            <Loading className={styles.minorLoading} height={40} width={40} text={false} />
-          )}
-          {loading ? (
-            <Loading className={styles.loading} height={80} width={80} text={true} />
-          ) : (
-            <Plot
-              data={data}
-              labels={labels}
-              plotState={plotState}
-              onSelectedData={handleSelectedData}
-              setPlotState={(state) => setPlotState(state)}
-            />
-          )}
-        </div>
+                  <ExportTasks
+                    selectedData={selectedData}
+                    selectedGenes={selectedGenes}
+                    resourcesDir={resourcesDir}
+                    currentResource={currentResource}
+                  ></ExportTasks>
+                </div>
+
+                {selectedData.length > 0 ? (
+                  <>
+                    <Row index={<b>Index</b>} score={<b>Score</b>} color={'white'}></Row>{' '}
+                    {/* Header */}
+                    <div className={styles.selectedContainer}>
+                      {selectedData.map((point, i) => (
+                        <Row
+                          key={`selected-point-${i}`}
+                          index={point.index}
+                          score={point.score.toFixed(3)}
+                          color={point.color}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className={styles.selectedMessage}>Drag mouse over plot to select points.</p>
+                )}
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ResizablePanel>
+          <ResizableHandle></ResizableHandle>
+          <ResizablePanel>
+            <div className={styles.plotArea}>
+              {minorLoading && (
+                <Loading className={styles.minorLoading} height={40} width={40} text={false} />
+              )}
+              {loading ? (
+                <Loading className={styles.loading} height={80} width={80} text={true} />
+              ) : (
+                <Plot
+                  data={data}
+                  labels={labels}
+                  plotState={plotState}
+                  onSelectedData={handleSelectedData}
+                  setPlotState={(state) => setPlotState(state)}
+                />
+              )}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </>
   )
